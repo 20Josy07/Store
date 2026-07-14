@@ -76,6 +76,7 @@ export default function AdminPanel({
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [searchTermInventory, setSearchTermInventory] = useState('');
   const [searchTermOrders, setSearchTermOrders] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -1101,15 +1102,24 @@ export default function AdminPanel({
                               </span>
                             </td>
                             <td className="py-4 text-right">
-                              <select
-                                value={o.estado}
-                                onChange={(e) => onUpdateOrderStatus(o.id, e.target.value as any).then(() => showToast(`Pedido ${o.id.slice(0,8)}... actualizado a ${e.target.value}.`))}
-                                className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-bold text-slate-700 cursor-pointer focus:ring-1 focus:ring-slate-300"
-                              >
-                                <option value="pendiente">Pendiente</option>
-                                <option value="enviado">Enviado</option>
-                                <option value="entregado">Entregado</option>
-                              </select>
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => setSelectedOrder(o)}
+                                  className="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-900 rounded-lg transition-colors cursor-pointer inline-flex items-center"
+                                  title="Ver detalle completo"
+                                >
+                                  <Search className="w-3.5 h-3.5" />
+                                </button>
+                                <select
+                                  value={o.estado}
+                                  onChange={(e) => onUpdateOrderStatus(o.id, e.target.value as any).then(() => showToast(`Pedido ${o.id.slice(0,8)}... actualizado a ${e.target.value}.`))}
+                                  className="px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-[10px] font-bold text-slate-700 cursor-pointer focus:ring-1 focus:ring-slate-300"
+                                >
+                                  <option value="pendiente">Pendiente</option>
+                                  <option value="enviado">Enviado</option>
+                                  <option value="entregado">Entregado</option>
+                                </select>
+                              </div>
                             </td>
                           </tr>
                         ))
@@ -1282,9 +1292,124 @@ export default function AdminPanel({
           )}
 
         </main>
-
       </div>
 
+      {/* MODAL DETALLE DE PEDIDO */}
+      {selectedOrder && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-2xl rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div>
+                <h2 className="text-xl font-black text-slate-900 tracking-tight">Detalles del Pedido</h2>
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">ID: {selectedOrder.id}</p>
+              </div>
+              <button 
+                onClick={() => setSelectedOrder(null)}
+                className="p-2 hover:bg-slate-100 text-slate-400 hover:text-slate-900 rounded-xl transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-8">
+              {/* Info Cliente y Envío */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest border-b border-slate-100 pb-2 flex items-center gap-2">
+                    <Users className="w-3 h-3" /> Datos del Cliente
+                  </h3>
+                  <div className="space-y-2.5">
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 block uppercase">Nombre Completo</span>
+                      <p className="text-sm font-bold text-slate-800">{selectedOrder.direccion_envio.nombre}</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 block uppercase">Correo Electrónico</span>
+                      <p className="text-sm font-bold text-slate-800">{selectedOrder.direccion_envio.email}</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 block uppercase">Teléfono / WhatsApp</span>
+                      <p className="text-sm font-bold text-slate-800">{selectedOrder.direccion_envio.telefono}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest border-b border-slate-100 pb-2 flex items-center gap-2">
+                    <Package className="w-3 h-3" /> Información de Envío
+                  </h3>
+                  <div className="space-y-2.5">
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 block uppercase">Dirección Exacta</span>
+                      <p className="text-sm font-bold text-slate-800">{selectedOrder.direccion_envio.direccion}</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 block uppercase">Ciudad / Municipio</span>
+                      <p className="text-sm font-bold text-slate-800">{selectedOrder.direccion_envio.ciudad}</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 block uppercase">Código Postal</span>
+                      <p className="text-sm font-bold text-slate-800">{selectedOrder.direccion_envio.codigo_postal || 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Items del Pedido */}
+              <div className="space-y-4">
+                <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest border-b border-slate-100 pb-2">Artículos del Pedido ({selectedOrder.items.length})</h3>
+                <div className="bg-slate-50 rounded-2xl border border-slate-100 overflow-hidden">
+                  <table className="w-full text-left border-collapse">
+                    <tbody className="divide-y divide-slate-200/50">
+                      {selectedOrder.items.map((it, idx) => (
+                        <tr key={idx} className="text-xs">
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-12 bg-white rounded-lg border border-slate-200 overflow-hidden shrink-0">
+                                <img src={it.imagen} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                              </div>
+                              <div>
+                                <p className="font-bold text-slate-900">{it.nombre}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className={`w-2 h-2 rounded-full ${getColorStyle(it.color)} border border-slate-200`} />
+                                  <span className="text-[10px] text-slate-500 font-semibold">{it.color} / Talla {it.talla}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3 px-4 text-center font-bold text-slate-600">x{it.cantidad}</td>
+                          <td className="py-3 px-4 text-right font-black text-slate-900">{formatPrice(it.precio_unitario * it.cantidad)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+              <div>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Total del Pedido</span>
+                <p className="text-2xl font-black text-slate-900">{formatPrice(selectedOrder.total)}</p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    const phoneNumber = "573197995950";
+                    const message = `Hola ${selectedOrder.direccion_envio.nombre}, te contactamos de STORE por tu pedido ${selectedOrder.id}.`;
+                    window.open(`https://wa.me/${selectedOrder.direccion_envio.telefono.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+                  }}
+                  className="px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+                >
+                  Contactar Cliente
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
