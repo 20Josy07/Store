@@ -95,13 +95,8 @@ service cloudfirestore {
 
     match /usuarios/{userId} {
       allow read: if isSignedIn();
-      allow create: if isUser(userId) && (
-        !incoming().keys().hasAny(['esAdmin']) || incoming().esAdmin == false
-      );
-      allow update: if isUser(userId) && (
-        (!incoming().keys().hasAny(['esAdmin']) && !existing().keys().hasAny(['esAdmin'])) ||
-        incoming().esAdmin == existing().esAdmin
-      );
+      allow create: if isUser(userId) && incoming().get('esAdmin', false) == false;
+      allow update: if isUser(userId) && incoming().get('esAdmin', false) == existing().get('esAdmin', false);
       allow delete: if isAdmin();
     }
 
