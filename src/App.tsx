@@ -379,7 +379,7 @@ export default function App() {
         
         {/* VIEW 1: HOME CATALOG VIEW */}
         {currentPage === 'home' && (
-          <div id="home-store-page" className="ml-64 p-10 space-y-12 animate-fade-in bg-[#F8F9FA]">
+          <div id="home-store-page" className="lg:ml-64 p-4 md:p-10 space-y-12 animate-fade-in bg-[#F8F9FA]">
             
             {/* Grid Banners Promocionales (dynamic CMS config) */}
             <section id="promo-banners-grid" className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -390,15 +390,15 @@ export default function App() {
                 className="p-8 md:p-10 rounded-[16px] flex flex-col justify-center aspect-[2.2/1] relative overflow-hidden group"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#6C757D]">Boutique Special Offer</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#6C757D]">Oferta Especial Boutique</span>
                 <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-[#1A1A1A] leading-tight max-w-[280px] mt-2 tracking-tight">
-                  {homeConfig.banner1_texto || 'GET UP TO 50% For the holiday season'}
+                  {homeConfig.banner1_texto || 'HASTA 50% DE DCTO por temporada navideña'}
                 </h2>
                 <button 
                   onClick={() => setCurrentCategory('Outlet')}
                   className="mt-5 text-[12px] font-bold underline underline-offset-4 tracking-wider uppercase text-[#1A1A1A] cursor-pointer text-left w-fit"
                 >
-                  SHOP NOW
+                  COMPRAR AHORA
                 </button>
               </div>
 
@@ -409,15 +409,15 @@ export default function App() {
                 className="p-8 md:p-10 rounded-[16px] flex flex-col justify-center aspect-[2.2/1] relative overflow-hidden group"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#6C757D]">Performance Drop</span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#6C757D]">Nueva Colección</span>
                 <h2 className="text-lg md:text-xl lg:text-2xl font-bold text-[#1A1A1A] leading-tight max-w-[280px] mt-2 tracking-tight">
-                  {homeConfig.banner2_texto || 'GET UP TO 30% OFF SHIRTS ⚡'}
+                  {homeConfig.banner2_texto || 'HASTA 30% DE DCTO EN CAMISAS ⚡'}
                 </h2>
                 <button 
                   onClick={() => setCurrentCategory('ActiveWear')}
                   className="mt-5 text-[12px] font-bold underline underline-offset-4 tracking-wider uppercase text-[#1A1A1A] cursor-pointer text-left w-fit"
                 >
-                  EXPLORE DEALS
+                  EXPLORAR OFERTAS
                 </button>
               </div>
             </section>
@@ -427,8 +427,8 @@ export default function App() {
               <section id="featured-carousel-section" className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-[11px] font-semibold text-[#6C757D] uppercase tracking-wider">Premium Selection</h3>
-                    <h2 className="text-xl font-bold text-[#1A1A1A] tracking-tighter mt-1">Featured Showcase</h2>
+                    <h3 className="text-[11px] font-semibold text-[#6C757D] uppercase tracking-wider">Selección Premium</h3>
+                    <h2 className="text-xl font-bold text-[#1A1A1A] tracking-tighter mt-1">Productos Destacados</h2>
                   </div>
                   {/* Circle navigation arrows */}
                   <div className="flex gap-2">
@@ -481,7 +481,7 @@ export default function App() {
                             )}
                           </div>
                           <span className="text-[12px] font-bold text-[#1A1A1A] hover:text-[#E63946] underline underline-offset-4 flex items-center gap-1">
-                            Explore Item
+                            Explorar Artículo
                           </span>
                         </div>
                       </div>
@@ -495,18 +495,18 @@ export default function App() {
             <section id="products-catalog-section" className="space-y-6">
               <div className="flex items-center justify-between border-b border-gray-100 pb-3">
                 <h2 className="text-xl font-bold text-[#1A1A1A] tracking-tighter">
-                  {currentCategory === 'New in' ? `New-In Selection` : `${currentCategory}`}
+                  {currentCategory === 'New in' ? `Novedades` : `${currentCategory}`}
                 </h2>
                 <span className="text-[12px] text-[#6C757D] font-medium">
-                  Showing {filteredProducts.length} products
+                  Mostrando {filteredProducts.length} productos
                 </span>
               </div>
 
               {filteredProducts.length === 0 ? (
                 <div id="no-products-state" className="text-center py-16 bg-white rounded-[16px] border border-gray-100 shadow-sm">
                   <span className="text-2xl">🔍</span>
-                  <p className="text-xs font-bold text-gray-900 mt-2">No items found matching criteria</p>
-                  <p className="text-[11px] text-gray-400 mt-1">Try relaxing filters or search terms.</p>
+                  <p className="text-xs font-bold text-gray-900 mt-2">No se encontraron artículos con estos criterios</p>
+                  <p className="text-[11px] text-gray-400 mt-1">Intenta relajar los filtros o términos de búsqueda.</p>
                 </div>
               ) : (
                 <div id="products-grid" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -70,7 +70,7 @@ export default function AdminPanel({
 }: AdminPanelProps) {
 
   // --- STATE MANAGEMENT ---
-  const [activeTab, setActiveTab] = useState<'inventario' | 'pedidos'>('inventario');
+  const [activeTab, setActiveTab] = useState<'inventario' | 'pedidos' | 'config' | 'cupones'>('inventario');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -79,6 +79,9 @@ export default function AdminPanel({
 
   // Product Form states
   const [isEditingProduct, setIsEditingProduct] = useState(false);
+  const [newCouponCode, setNewCouponCode] = useState('');
+  const [newCouponType, setNewCouponType] = useState<'porcentaje'|'fijo'>('porcentaje');
+  const [newCouponValue, setNewCouponValue] = useState(10);
   const [productForm, setProductForm] = useState<Product>({
     id: '',
     nombre: '',
@@ -388,6 +391,30 @@ export default function AdminPanel({
                   <Clock className="w-4 h-4 shrink-0" />
                   Pedidos
                 </button>
+                <button
+                  id="menu-btn-config"
+                  onClick={() => { setActiveTab('config'); setIsMobileSidebarOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-black tracking-wide transition-all duration-200 cursor-pointer ${
+                    activeTab === 'config'
+                      ? 'bg-red-600/90 text-white shadow-lg shadow-red-900/10'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                  }`}
+                >
+                  <Layers className="w-4 h-4 shrink-0" />
+                  Configuración Home
+                </button>
+                <button
+                  id="menu-btn-cupones"
+                  onClick={() => { setActiveTab('cupones'); setIsMobileSidebarOpen(false); }}
+                  className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-black tracking-wide transition-all duration-200 cursor-pointer ${
+                    activeTab === 'cupones'
+                      ? 'bg-red-600/90 text-white shadow-lg shadow-red-900/10'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                  }`}
+                >
+                  <Percent className="w-4 h-4 shrink-0" />
+                  Cupones
+                </button>
               </nav>
             </div>
           </div>
@@ -428,7 +455,7 @@ export default function AdminPanel({
                 {activeTab}
               </h1>
               <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-widest hidden sm:block">
-                {activeTab === 'inventario' ? 'Control de catálogo de productos' : 'Seguimiento de compras y envíos'}
+                {activeTab === 'inventario' ? 'Control de catálogo de productos' : activeTab === 'pedidos' ? 'Seguimiento de compras y envíos' : activeTab === 'config' ? 'Ajustes del Inicio' : 'Gestión de Códigos de Descuento'}
               </p>
             </div>
           </div>
@@ -958,6 +985,165 @@ export default function AdminPanel({
                 </div>
               </div>
 
+            </div>
+          )}
+
+          {/* TAB 3: CONFIGURACIÓN HOME */}
+          {activeTab === 'config' && (
+            <div id="seccion-config-content" className="space-y-6 animate-fade-in">
+              <div id="encabezado-config" className="bg-white p-6 rounded-2xl border border-slate-150/40 shadow-sm">
+                <h2 className="text-base font-black text-slate-900">Configuración del Inicio (CMS)</h2>
+                <p className="text-xs text-slate-400 font-semibold mt-1">Gestiona los textos y fondos de las tarjetas promocionales del inicio.</p>
+              </div>
+
+              <div className="bg-white p-6 rounded-2xl border border-slate-150/40 shadow-sm max-w-2xl space-y-6">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Banner 1 (Oferta Especial)</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase">Texto del Banner</label>
+                      <input
+                        type="text"
+                        value={homeConfig.banner1_texto || ''}
+                        onChange={(e) => onUpdateHomeConfig({ ...homeConfig, banner1_texto: e.target.value })}
+                        className="w-full mt-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:ring-1 focus:ring-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase">Color de Fondo (Hex)</label>
+                      <input
+                        type="text"
+                        value={homeConfig.banner1_bg || ''}
+                        onChange={(e) => onUpdateHomeConfig({ ...homeConfig, banner1_bg: e.target.value })}
+                        className="w-full mt-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:ring-1 focus:ring-slate-300"
+                        placeholder="#F4EBE1"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2 mt-6">Banner 2 (Nueva Colección)</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase">Texto del Banner</label>
+                      <input
+                        type="text"
+                        value={homeConfig.banner2_texto || ''}
+                        onChange={(e) => onUpdateHomeConfig({ ...homeConfig, banner2_texto: e.target.value })}
+                        className="w-full mt-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:ring-1 focus:ring-slate-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 uppercase">Color de Fondo (Hex)</label>
+                      <input
+                        type="text"
+                        value={homeConfig.banner2_bg || ''}
+                        onChange={(e) => onUpdateHomeConfig({ ...homeConfig, banner2_bg: e.target.value })}
+                        className="w-full mt-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:ring-1 focus:ring-slate-300"
+                        placeholder="#AEE5E5"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => showToast('Configuración del Home guardada en Firestore')}
+                  className="w-full py-3 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors cursor-pointer"
+                >
+                  Guardar Configuración
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: CUPONES */}
+          {activeTab === 'cupones' && (
+            <div id="seccion-cupones-content" className="space-y-6 animate-fade-in">
+              <div id="encabezado-cupones" className="bg-white p-6 rounded-2xl border border-slate-150/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-base font-black text-slate-900">Gestión de Cupones</h2>
+                  <p className="text-xs text-slate-400 font-semibold mt-1">Crea y administra códigos de descuento promocionales.</p>
+                </div>
+              </div>
+
+              {/* Lista Cupones */}
+              <div className="bg-white p-6 rounded-2xl border border-slate-150/40 shadow-sm">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {coupons.map((c) => (
+                    <div key={c.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-black text-slate-900">{c.id}</p>
+                        <p className="text-xs font-bold text-emerald-600 mt-1">
+                          {c.tipo === 'porcentaje' ? `${c.valor}% DCTO` : `$${c.valor} DCTO`}
+                        </p>
+                        {c.categoria_restringida && (
+                          <span className="text-[10px] bg-slate-200 px-2 py-0.5 rounded-full mt-2 inline-block font-semibold">Sólo {c.categoria_restringida}</span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => onDeleteCoupon(c.id).then(() => showToast(`Cupón ${c.id} eliminado.`))}
+                        className="p-2 text-slate-400 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors cursor-pointer"
+                        title="Eliminar cupón"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  
+                  {/* Formulario Crear Nuevo Cupón */}
+                  <div className="p-4 border-2 border-dashed border-slate-300 rounded-xl flex flex-col gap-3 justify-center transition-colors min-h-[100px]">
+                    <div className="flex flex-col gap-2">
+                      <input 
+                        type="text" 
+                        placeholder="Código (ej. VERANO20)" 
+                        value={newCouponCode}
+                        onChange={(e) => setNewCouponCode(e.target.value)}
+                        className="w-full px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-slate-300"
+                      />
+                      <div className="flex gap-2">
+                        <select 
+                          value={newCouponType}
+                          onChange={(e) => setNewCouponType(e.target.value as 'porcentaje'|'fijo')}
+                          className="flex-1 px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-slate-300"
+                        >
+                          <option value="porcentaje">Porcentaje (%)</option>
+                          <option value="fijo">Fijo ($)</option>
+                        </select>
+                        <input 
+                          type="number" 
+                          min={1}
+                          value={newCouponValue}
+                          onChange={(e) => setNewCouponValue(Number(e.target.value))}
+                          className="w-20 px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-slate-300"
+                        />
+                      </div>
+                      <button 
+                        onClick={() => {
+                          if(!newCouponCode.trim()) return;
+                          const nuevoCupon: Coupon = {
+                            id: newCouponCode.trim().toUpperCase(),
+                            tipo: newCouponType,
+                            valor: newCouponValue,
+                            fecha_expiracion: new Date(Date.now() + 30*24*60*60*1000).toISOString(),
+                            categoria_restringida: null
+                          };
+                          onAddCoupon(nuevoCupon).then(() => {
+                            showToast(`Cupón ${nuevoCupon.id} creado.`);
+                            setNewCouponCode('');
+                            setNewCouponValue(10);
+                          });
+                        }}
+                        className="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                      >
+                        <span className="flex items-center justify-center gap-1">
+                          <Plus className="w-4 h-4" /> Crear Cupón
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

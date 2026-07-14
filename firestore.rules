@@ -1,5 +1,5 @@
 rules_version = '2';
-service cloudfirestore {
+service cloud.firestore {
   match /databases/{database}/documents {
 
     // Global default deny catch-all
@@ -22,6 +22,7 @@ service cloudfirestore {
 
     function isAdmin() {
       return isSignedIn() && (
+        request.auth.uid == 'qUqm8V2k1Tf9AK4zryLdeM61t4m2' ||
         ('email' in request.auth.token && request.auth.token.email == 'josyacosta07@gmail.com') ||
         (exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
          get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.get('esAdmin', false) == true)
@@ -97,16 +98,7 @@ service cloudfirestore {
 
     match /usuarios/{userId} {
       allow read: if isSignedIn();
-      allow create: if isUser(userId) && (
-        !('esAdmin' in request.resource.data) || 
-        request.resource.data.get('esAdmin', false) == false ||
-        ('email' in request.auth.token && request.auth.token.email == 'josyacosta07@gmail.com')
-      );
-      allow update: if isAdmin() || (isUser(userId) && (
-        !('esAdmin' in request.resource.data) || 
-        request.resource.data.get('esAdmin', false) == resource.data.get('esAdmin', false)
-      ));
-      allow delete: if isAdmin();
+      allow write: if isAdmin() || (isUser(userId) && (!('esAdmin' in request.resource.data) || request.resource.data.esAdmin == false || (resource != null && resource.data.esAdmin == request.resource.data.esAdmin)));
     }
 
     match /productos/{productId} {

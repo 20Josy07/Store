@@ -35,45 +35,80 @@ export default function Header({
   return (
     <header 
       id="storefront-header" 
-      className="sticky top-0 right-0 left-0 bg-[#F8F9FA]/90 backdrop-blur-md flex items-center justify-between px-4 md:px-10 py-6 z-20 lg:ml-64 ml-0 h-24 gap-2 md:gap-4 border-b border-slate-100"
+      className="sticky top-0 right-0 left-0 bg-[#F8F9FA]/90 backdrop-blur-md flex flex-wrap md:flex-nowrap items-center justify-between px-4 md:px-10 py-4 md:py-6 z-20 lg:ml-64 ml-0 min-h-24 gap-y-4 gap-x-2 border-b border-slate-100"
     >
-      {/* Mobile Menu & Gender Filters (Tabs) */}
-      <div id="header-gender-filters" className="flex items-center gap-2 bg-[#F2F2F5] p-1 rounded-[16px] w-fit">
-        {onToggleSidebar && (
+      <div className="flex items-center justify-between w-full md:w-auto order-1 md:order-none gap-2">
+        {/* Mobile Menu & Gender Filters (Tabs) */}
+        <div id="header-gender-filters" className="flex items-center gap-2 bg-[#F2F2F5] p-1 rounded-[16px] w-fit shrink-0">
+          {onToggleSidebar && (
+            <button
+              onClick={onToggleSidebar}
+              className="lg:hidden p-2 bg-white hover:bg-slate-100 text-slate-800 rounded-xl cursor-pointer"
+              title="Menu"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+          )}
           <button
-            onClick={onToggleSidebar}
-            className="lg:hidden p-2 bg-white hover:bg-slate-100 text-slate-800 rounded-xl cursor-pointer"
-            title="Menu"
+            id="btn-gender-women"
+            onClick={() => onGenderChange('Women')}
+            className={`flex items-center gap-1.5 px-3 md:px-6 py-2.5 rounded-[12px] text-xs md:text-[14px] font-semibold transition-all duration-300 cursor-pointer ${
+              currentGender === 'Women'
+                ? 'bg-white text-[#1A1A1A] shadow-sm'
+                : 'text-[#6C757D] hover:text-[#1A1A1A]'
+            }`}
           >
-            <Menu className="w-4 h-4" />
+            <span>👩🏼</span> <span className="hidden sm:inline">Mujer</span>
           </button>
-        )}
-        <button
-          id="btn-gender-women"
-          onClick={() => onGenderChange('Women')}
-          className={`flex items-center gap-1.5 px-3 md:px-6 py-2.5 rounded-[12px] text-xs md:text-[14px] font-semibold transition-all duration-300 cursor-pointer ${
-            currentGender === 'Women'
-              ? 'bg-white text-[#1A1A1A] shadow-sm'
-              : 'text-[#6C757D] hover:text-[#1A1A1A]'
-          }`}
-        >
-          <span>👩🏼</span> <span className="hidden sm:inline">Mujer</span>
-        </button>
-        <button
-          id="btn-gender-men"
-          onClick={() => onGenderChange('Men')}
-          className={`flex items-center gap-1.5 px-3 md:px-6 py-2.5 rounded-[12px] text-xs md:text-[14px] font-semibold transition-all duration-300 cursor-pointer ${
-            currentGender === 'Men'
-              ? 'bg-white text-[#1A1A1A] shadow-sm'
-              : 'text-[#6C757D] hover:text-[#1A1A1A]'
-          }`}
-        >
-          <span>👨🏻</span> <span className="hidden sm:inline">Hombre</span>
-        </button>
+          <button
+            id="btn-gender-men"
+            onClick={() => onGenderChange('Men')}
+            className={`flex items-center gap-1.5 px-3 md:px-6 py-2.5 rounded-[12px] text-xs md:text-[14px] font-semibold transition-all duration-300 cursor-pointer ${
+              currentGender === 'Men'
+                ? 'bg-white text-[#1A1A1A] shadow-sm'
+                : 'text-[#6C757D] hover:text-[#1A1A1A]'
+            }`}
+          >
+            <span>👨🏻</span> <span className="hidden sm:inline">Hombre</span>
+          </button>
+        </div>
+
+        {/* Cart Actions & User Account Controls (Mobile shows them here) */}
+        <div id="header-actions-mobile" className="flex md:hidden items-center gap-2 shrink-0">
+          <button
+            id="btn-open-cart-mobile"
+            onClick={onCartClick}
+            className="relative p-2.5 bg-white hover:bg-[#F2F2F5] rounded-[16px] text-[#1A1A1A] hover:text-black transition-all duration-200 cursor-pointer shadow-[0px_10px_30px_rgba(0,0,0,0.02)] border border-gray-150/30"
+          >
+            <ShoppingCart className="w-4 h-4" />
+            {cartCount > 0 && (
+              <span 
+                className="absolute -top-1.5 -right-1.5 bg-[#E63946] text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-[#F8F9FA]"
+              >
+                {cartCount}
+              </span>
+            )}
+          </button>
+          {user ? (
+            <button
+              onClick={onSignOut}
+              className="w-9 h-9 rounded-full bg-[#AEE5E5] border-2 border-white flex items-center justify-center text-[#1A1A1A] font-bold text-[10px] shadow-sm uppercase select-none cursor-pointer"
+            >
+              {user.nombre ? user.nombre.slice(0, 2) : <User className="w-3.5 h-3.5" />}
+            </button>
+          ) : (
+            <button
+              onClick={onSignIn}
+              className="p-2.5 bg-[#1A1A1A] text-white rounded-[16px] cursor-pointer"
+            >
+              <LogIn className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Modern Search Bar */}
-      <div id="header-search-container" className="flex-1 max-w-xs md:max-w-lg mx-1 md:mx-10 relative">
+      <div id="header-search-container" className="flex-1 w-full md:w-auto max-w-full md:max-w-lg mx-0 md:mx-10 relative order-3 md:order-none shrink-0">
         <span className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-[#6C757D]">
           <Search className="w-3.5 h-3.5 md:w-4 md:h-4" />
         </span>
@@ -83,12 +118,12 @@ export default function Header({
           placeholder="Buscar prendas, marcas..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-9 md:pl-12 pr-4 py-2 md:py-3 bg-white border-0 rounded-[16px] text-xs md:text-[14px] transition-all duration-300 text-[#1A1A1A] placeholder-[#6C757D] shadow-[0px_10px_30px_rgba(0,0,0,0.03)] focus:ring-2 focus:ring-gray-200 focus:outline-none"
+          className="w-full pl-9 md:pl-12 pr-4 py-2.5 md:py-3 bg-white border-0 rounded-[16px] text-xs md:text-[14px] transition-all duration-300 text-[#1A1A1A] placeholder-[#6C757D] shadow-[0px_10px_30px_rgba(0,0,0,0.03)] focus:ring-2 focus:ring-gray-200 focus:outline-none"
         />
       </div>
 
-      {/* Cart Actions & User Account Controls */}
-      <div id="header-actions" className="flex items-center gap-2 md:gap-6">
+      {/* Cart Actions & User Account Controls (Desktop) */}
+      <div id="header-actions" className="hidden md:flex items-center gap-6 order-2 md:order-none shrink-0">
         {/* Shopping Cart Trigger */}
         <button
           id="btn-open-cart"
