@@ -304,26 +304,30 @@ export default function App() {
     <div id="slate-storefront-app" className="bg-[#F8F9FA] min-h-screen relative font-sans text-gray-900">
       
       {/* Sticky Left Sidebar Navigation */}
-      <Sidebar
-        currentCategory={currentCategory}
-        onCategoryChange={setCurrentCategory}
-        isAdminUser={!!user?.esAdmin}
-        currentPage={currentPage}
-        onNavigate={setCurrentPage}
-      />
+      {currentPage !== 'admin' && (
+        <Sidebar
+          currentCategory={currentCategory}
+          onCategoryChange={setCurrentCategory}
+          isAdminUser={!!user?.esAdmin}
+          currentPage={currentPage}
+          onNavigate={setCurrentPage}
+        />
+      )}
 
       {/* Top Navbar Actions Header */}
-      <Header
-        currentGender={currentGender}
-        onGenderChange={setCurrentGender}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        cartCount={cartCount}
-        onCartClick={() => setIsCartOpen(true)}
-        user={user}
-        onSignIn={handleSignIn}
-        onSignOut={handleSignOut}
-      />
+      {currentPage !== 'admin' && (
+        <Header
+          currentGender={currentGender}
+          onGenderChange={setCurrentGender}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          cartCount={cartCount}
+          onCartClick={() => setIsCartOpen(true)}
+          user={user}
+          onSignIn={handleSignIn}
+          onSignOut={handleSignOut}
+        />
+      )}
 
       {/* --- CONTENT ROUTER VIEWS --- */}
       <main id="main-content-window" className="relative transition-all duration-300">

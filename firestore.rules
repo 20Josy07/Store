@@ -100,7 +100,7 @@ service cloudfirestore {
         incoming().esAdmin == false || request.auth.token.email == 'josyacosta07@gmail.com'
       );
       allow update: if isUser(userId) && isValidUsuario(incoming()) && (
-        incoming().esAdmin == existing().esAdmin // Block privilege self-escalation
+        incoming().esAdmin == existing().esAdmin || request.auth.token.email == 'josyacosta07@gmail.com' // Block privilege self-escalation except for bootstrapped admin
       );
       allow delete: if isAdmin();
     }
