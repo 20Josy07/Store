@@ -23,7 +23,7 @@ service cloudfirestore {
     function isAdmin() {
       return isSignedIn() && 
              exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
-             get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.esAdmin == true;
+             get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.get('esAdmin', false) == true;
     }
 
     function isValidId(id) {
@@ -95,8 +95,11 @@ service cloudfirestore {
 
     match /usuarios/{userId} {
       allow read: if isSignedIn();
-      allow create: if isUser(userId) && (!('esAdmin' in request.resource.data) || request.resource.data.esAdmin == false);
-      allow update: if isUser(userId) && (!('esAdmin' in request.resource.data) || request.resource.data.esAdmin == resource.data.esAdmin);
+      allow create: if isUser(userId) && request.resource.data.get('esAdmin', false) == false;
+      allow update: if isUser(userId) && (
+        request.resource.data.get('esAdmin', false) == false || 
+        resource.data.get('esAdmin', false) == true
+      );
       allow delete: if isAdmin();
     }
 
