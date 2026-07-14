@@ -1,4 +1,4 @@
-import { formatPrice } from "../lib/utils";
+import { formatPrice, getColorStyle } from "../lib/utils";
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -166,16 +166,7 @@ export default function ProductDetailsModal({
                 </span>
                 <div className="flex flex-wrap gap-2.5">
                   {colors.map((color) => {
-                    // Quick swatch background mapping (fallback to slate)
-                    const normalized = color.toLowerCase();
-                    let swatchStyle = "bg-gray-200";
-                    if (normalized.includes('black') || normalized.includes('raven') || normalized.includes('obsidian')) swatchStyle = "bg-gray-900";
-                    else if (normalized.includes('white') || normalized.includes('ecrù') || normalized.includes('cream')) swatchStyle = "bg-white border border-gray-200";
-                    else if (normalized.includes('grey') || normalized.includes('slate')) swatchStyle = "bg-slate-400";
-                    else if (normalized.includes('green') || normalized.includes('sage')) swatchStyle = "bg-[#CCD5AE]";
-                    else if (normalized.includes('rose') || normalized.includes('pink')) swatchStyle = "bg-[#FEC5BB]";
-                    else if (normalized.includes('navy')) swatchStyle = "bg-blue-900";
-                    else if (normalized.includes('camel') || normalized.includes('sand') || normalized.includes('mocha') || normalized.includes('oat')) swatchStyle = "bg-[#DDBDF1]";
+                    const swatchStyle = getColorStyle(color);
 
                     return (
                       <button

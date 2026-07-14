@@ -553,7 +553,6 @@ export default function App() {
                     <ProductCard
                       key={p.id}
                       product={p}
-                      reviews={reviews.filter(r => r.producto_id === p.id)}
                       onProductClick={setActiveProductDetail}
                       onAddToCart={(product) => handleAddToCart(product, 1)}
                     />
