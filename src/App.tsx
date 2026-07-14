@@ -7,8 +7,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   auth, 
   db, 
-  googleProvider, 
-  signInWithPopup, 
   signOut, 
   onAuthStateChanged,
   syncUserProfile,
@@ -41,6 +39,7 @@ import ProductDetailsModal from './components/ProductDetailsModal';
 import CartDrawer from './components/CartDrawer';
 import CheckoutView from './components/CheckoutView';
 import AdminPanel from './components/AdminPanel';
+import AuthModal from './components/AuthModal';
 import { ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
 
 export default function App() {
@@ -71,6 +70,7 @@ export default function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeProductDetail, setActiveProductDetail] = useState<Product | null>(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // --- 1. BOOTSTRAP SEEDING & AUTH & REAL-TIME FIRESTORE SUBSCRIPTIONS ---
   useEffect(() => {
@@ -188,12 +188,8 @@ export default function App() {
   }, [cartItems]);
 
   // --- AUTH TRIGGERS ---
-  const handleSignIn = async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (err) {
-      console.error("Popup login failed:", err);
-    }
+  const handleSignIn = () => {
+    setIsAuthModalOpen(true);
   };
 
   const handleSignOut = async () => {
@@ -536,6 +532,13 @@ export default function App() {
           onAddToCart={handleAddToCart}
         />
       )}
+
+      {/* Auth Modal for Email & Password */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onAuthSuccess={(profile) => setUser(profile)}
+      />
 
     </div>
   );

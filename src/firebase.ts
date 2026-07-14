@@ -10,6 +10,8 @@ import {
   signInWithPopup, 
   signOut,
   onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   User
 } from 'firebase/auth';
 import { 
@@ -107,7 +109,7 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 }
 
 // User bootstrapper to save profile in Firestore on login
-export async function syncUserProfile(user: User): Promise<{ uid: string; email: string; nombre: string; esAdmin: boolean }> {
+export async function syncUserProfile(user: User, customNombre?: string): Promise<{ uid: string; email: string; nombre: string; esAdmin: boolean }> {
   const userDocRef = doc(db, 'usuarios', user.uid);
   try {
     const userSnapshot = await getDoc(userDocRef);
@@ -121,8 +123,18 @@ export async function syncUserProfile(user: User): Promise<{ uid: string; email:
         return {
           uid: user.uid,
           email: user.email || '',
-          nombre: user.displayName || 'Client',
+          nombre: customNombre || data.nombre || user.displayName || 'Client',
           esAdmin: true
+        };
+      }
+      // If customNombre is provided and different, we update it
+      if (customNombre && customNombre !== data.nombre) {
+        await updateDoc(userDocRef, { nombre: customNombre });
+        return {
+          uid: user.uid,
+          email: data.email || user.email || '',
+          nombre: customNombre,
+          esAdmin: !!data.esAdmin
         };
       }
       return {
@@ -136,7 +148,7 @@ export async function syncUserProfile(user: User): Promise<{ uid: string; email:
       const newProfile = {
         uid: user.uid,
         email: user.email || '',
-        nombre: user.displayName || 'Client',
+        nombre: customNombre || user.displayName || 'Client',
         esAdmin: isBootstrappedAdmin // Bootstrap user as admin if email matches
       };
       await setDoc(userDocRef, newProfile);
@@ -163,5 +175,7 @@ export {
   orderBy,
   signInWithPopup,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
 };

@@ -130,7 +130,7 @@ export default function Header({
             className="flex items-center gap-2 px-6 py-2.5 bg-[#1A1A1A] hover:bg-black text-white rounded-[16px] text-[14px] font-semibold transition-all duration-300 shadow-md cursor-pointer"
           >
             <LogIn className="w-4 h-4" />
-            Sign In with Google
+            Iniciar Sesión
           </button>
         )}
       </div>
