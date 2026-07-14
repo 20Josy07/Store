@@ -39,6 +39,8 @@ export default function CheckoutView({
 
   const [formErrors, setFormErrors] = useState<string>('');
   const [createdOrderId, setCreatedOrderId] = useState<string>('');
+  const [placedOrderTotal, setPlacedOrderTotal] = useState<number>(0);
+  const [placedOrderItems, setPlacedOrderItems] = useState<OrderItem[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Calculate pricing
@@ -121,6 +123,8 @@ export default function CheckoutView({
     try {
       await onPlaceOrder(newOrder);
       setCreatedOrderId(orderId);
+      setPlacedOrderTotal(finalTotal);
+      setPlacedOrderItems(orderItems);
       onClearCart();
       setStep(3);
     } catch (err) {
@@ -132,17 +136,14 @@ export default function CheckoutView({
 
   const handleWhatsAppRedirect = () => {
     const phoneNumber = "573197995950";
-    const itemsList = cartItems.length > 0 
-      ? cartItems.map(item => `- ${item.producto.nombre} (${item.color_seleccionado}/${item.talla_seleccionada}) x${item.cantidad}`).join('\n')
+    const itemsList = placedOrderItems.length > 0 
+      ? placedOrderItems.map(item => `- ${item.nombre} (${item.color}/${item.talla}) x${item.cantidad}`).join('\n')
       : "Items del pedido (ver en el panel)";
 
     const message = `🛍️ *NUEVO PEDIDO - STORE*\n\n` +
-      `*ID del Pedido:* ${createdOrderId}\n` +
-      `*Cliente:* ${address.nombre}\n` +
-      `*Teléfono:* ${address.telefono}\n` +
-      `*Dirección:* ${address.direccion}, ${address.ciudad}\n\n` +
+      `*ID del Pedido:* ${createdOrderId}\n\n` +
       `*Productos:*\n${itemsList}\n\n` +
-      `*Total a Pagar:* ${formatPrice(finalTotal)}\n\n` +
+      `*Total a Pagar:* ${formatPrice(placedOrderTotal)}\n\n` +
       `_Hola, acabo de realizar un pedido. Adjunto el ID para coordinar el pago._`;
 
     const encodedMessage = encodeURIComponent(message);
@@ -365,7 +366,7 @@ export default function CheckoutView({
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>Total a Pagar:</span>
-                  <span className="text-gray-900 font-black">{formatPrice(finalTotal)}</span>
+                  <span className="text-gray-900 font-black">{formatPrice(placedOrderTotal)}</span>
                 </div>
                 <div className="pt-3 border-t border-gray-200 flex flex-col gap-1">
                   <span className="text-[10px] uppercase text-gray-400 tracking-wider">Enviarás a:</span>
