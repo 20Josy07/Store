@@ -21,9 +21,9 @@ service cloudfirestore {
     }
 
     function isAdmin() {
-      return isSignedIn() && (
-        get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.esAdmin == true
-      );
+      return isSignedIn() && 
+             exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.esAdmin == true;
     }
 
     function isValidId(id) {
@@ -95,25 +95,26 @@ service cloudfirestore {
 
     match /usuarios/{userId} {
       allow read: if isSignedIn();
-      allow create: if isUser(userId) && incoming().get('esAdmin', false) == false;
-      allow update: if isUser(userId) && incoming().get('esAdmin', false) == existing().get('esAdmin', false);
+      allow create: if isUser(userId) && (!('esAdmin' in request.resource.data) || request.resource.data.esAdmin == false);
+      allow update: if isUser(userId) && (!('esAdmin' in request.resource.data) || request.resource.data.esAdmin == resource.data.esAdmin);
       allow delete: if isAdmin();
     }
 
     match /productos/{productId} {
       allow read: if true; // Public catalogue
-      allow create: if (isAdmin() || isValidProducto(incoming())) && isValidId(productId);
+      allow create: if (isAdmin() || isValidProducto(request.resource.data)) && isValidId(productId);
       allow update: if (
         isAdmin() || 
-        (isValidProducto(incoming()) && 
-         incoming().precio_regular == existing().precio_regular && 
-         incoming().get('precio_descuento', null) == existing().get('precio_descuento', null) && 
-         incoming().nombre == existing().nombre && 
-         incoming().marca == existing().marca && 
-         incoming().categoria == existing().categoria && 
-         incoming().genero == existing().genero &&
-         incoming().descripcion == existing().descripcion &&
-         incoming().imagenes == existing().imagenes)
+        (isValidProducto(request.resource.data) && 
+         request.resource.data.precio_regular == resource.data.precio_regular && 
+         ((!('precio_descuento' in request.resource.data) && !('precio_descuento' in resource.data)) || 
+          (request.resource.data.precio_descuento == resource.data.precio_descuento)) && 
+         request.resource.data.nombre == resource.data.nombre && 
+         request.resource.data.marca == resource.data.marca && 
+         request.resource.data.categoria == resource.data.categoria && 
+         request.resource.data.genero == resource.data.genero &&
+         request.resource.data.descripcion == resource.data.descripcion &&
+         request.resource.data.imagenes == resource.data.imagenes)
       ) && isValidId(productId);
       allow delete: if isAdmin() && isValidId(productId);
     }

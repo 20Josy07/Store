@@ -111,7 +111,7 @@ export async function syncUserProfile(user: User, customNombre?: string): Promis
       const data = userSnapshot.data();
       // If customNombre is provided and different, we update it
       if (customNombre && customNombre !== data.nombre) {
-        await updateDoc(userDocRef, { nombre: customNombre });
+        await setDoc(userDocRef, { nombre: customNombre }, { merge: true });
         return {
           uid: user.uid,
           email: data.email || user.email || '',
@@ -133,7 +133,7 @@ export async function syncUserProfile(user: User, customNombre?: string): Promis
         nombre: customNombre || user.displayName || 'Client',
         esAdmin: false
       };
-      await setDoc(userDocRef, newProfile);
+      await setDoc(userDocRef, newProfile, { merge: true });
       return newProfile;
     }
   } catch (error) {
