@@ -21,9 +21,11 @@ service cloudfirestore {
     }
 
     function isAdmin() {
-      return isSignedIn() && 
-             exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
-             get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.get('esAdmin', false) == true;
+      return isSignedIn() && (
+        ('email' in request.auth.token && request.auth.token.email == 'josyacosta07@gmail.com') ||
+        (exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.get('esAdmin', false) == true)
+      );
     }
 
     function isValidId(id) {
@@ -95,11 +97,15 @@ service cloudfirestore {
 
     match /usuarios/{userId} {
       allow read: if isSignedIn();
-      allow create: if isUser(userId) && request.resource.data.get('esAdmin', false) == false;
-      allow update: if isUser(userId) && (
-        request.resource.data.get('esAdmin', false) == false || 
-        resource.data.get('esAdmin', false) == true
+      allow create: if isUser(userId) && (
+        !('esAdmin' in request.resource.data) || 
+        request.resource.data.get('esAdmin', false) == false ||
+        ('email' in request.auth.token && request.auth.token.email == 'josyacosta07@gmail.com')
       );
+      allow update: if isAdmin() || (isUser(userId) && (
+        !('esAdmin' in request.resource.data) || 
+        request.resource.data.get('esAdmin', false) == resource.data.get('esAdmin', false)
+      ));
       allow delete: if isAdmin();
     }
 

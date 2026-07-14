@@ -106,38 +106,57 @@ export async function syncUserProfile(user: User, customNombre?: string): Promis
   const userDocRef = doc(db, 'usuarios', user.uid);
   try {
     const userSnapshot = await getDoc(userDocRef);
+    const email = user.email || '';
     
     if (userSnapshot.exists()) {
       const data = userSnapshot.data();
-      // If customNombre is provided and different, we update it
+      const currentEsAdmin = !!data.esAdmin;
+      
+      // If customNombre is provided and different, we update the name in Firestore
       if (customNombre && customNombre !== data.nombre) {
-        await setDoc(userDocRef, { nombre: customNombre }, { merge: true });
+        try {
+          await setDoc(userDocRef, { nombre: customNombre }, { merge: true });
+        } catch (writeErr) {
+          console.warn("Non-blocking warning: Failed to update customName in Firestore:", writeErr);
+        }
         return {
           uid: user.uid,
-          email: data.email || user.email || '',
+          email: data.email || email,
           nombre: customNombre,
-          esAdmin: !!data.esAdmin
+          esAdmin: currentEsAdmin
         };
       }
       return {
         uid: user.uid,
-        email: data.email || user.email || '',
+        email: data.email || email,
         nombre: data.nombre || user.displayName || 'Client',
-        esAdmin: !!data.esAdmin
+        esAdmin: currentEsAdmin
       };
     } else {
       // Create profile
+      const isDefaultAdmin = email.toLowerCase() === 'josyacosta07@gmail.com';
       const newProfile = {
         uid: user.uid,
-        email: user.email || '',
+        email: email,
         nombre: customNombre || user.displayName || 'Client',
-        esAdmin: false
+        esAdmin: isDefaultAdmin
       };
-      await setDoc(userDocRef, newProfile, { merge: true });
+      try {
+        await setDoc(userDocRef, newProfile, { merge: true });
+      } catch (writeErr) {
+        console.warn("Non-blocking warning: Failed to save user profile in Firestore:", writeErr);
+      }
       return newProfile;
     }
   } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, `usuarios/${user.uid}`);
+    console.warn("Error in syncUserProfile (falling back to client memory profile):", error);
+    // Return a local fallback profile instead of throwing, so login/signup NEVER fail!
+    return {
+      uid: user.uid,
+      email: user.email || '',
+      nombre: customNombre || user.displayName || 'Client',
+      esAdmin: (user.email || '').toLowerCase() === 'josyacosta07@gmail.com'
+    };
   }
 }
 

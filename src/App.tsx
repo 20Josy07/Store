@@ -16,7 +16,6 @@ import {
   query,
   where
 } from './firebase';
-import { seedDatabaseIfEmpty } from './data/dbHelpers';
 import { 
   getProductsFromDB, 
   getCouponsFromDB, 
@@ -74,21 +73,14 @@ export default function App() {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  // --- 1. BOOTSTRAP SEEDING & AUTH & REAL-TIME FIRESTORE SUBSCRIPTIONS ---
+  // --- 1. BOOTSTRAP AUTH & REAL-TIME FIRESTORE SUBSCRIPTIONS ---
   useEffect(() => {
-    // A. Trigger auto-seeding
-    seedDatabaseIfEmpty();
-
-    // B. Auth Listener
+    // A. Auth Listener
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
           const profile = await syncUserProfile(firebaseUser);
           setUser(profile);
-          if (profile.esAdmin) {
-            // Re-trigger seeding under authenticated admin privileges
-            seedDatabaseIfEmpty();
-          }
         } catch (err) {
           console.error("Auth profile sync error:", err);
         }
