@@ -26,6 +26,18 @@ export default function ProductCard({
     onAddToCart(product);
   };
 
+  const translateCategory = (cat: string) => {
+    const map: Record<string, string> = {
+      'New in': 'Novedades',
+      'Clothing': 'Ropa',
+      'Shoes': 'Calzado',
+      'Accessories': 'Accesorios',
+      'ActiveWear': 'Deporte',
+      'Outlet': 'Outlet'
+    };
+    return map[cat] || cat;
+  };
+
   // Assign background colors to stage matching the "Natural Tones" palette:
   // Women -> soft pink (#FDECEF)
   // Shoes category -> cool slate-blue (#F4F5F7)
@@ -59,7 +71,7 @@ export default function ProductCard({
         {/* Promo tag if discount */}
         {hasDiscount && (
           <div className="absolute top-4 right-4 bg-[#E63946] text-white px-3 py-1.5 rounded-full shadow-sm text-[10px] font-extrabold tracking-wider animate-pulse">
-            SALE
+            OFERTA
           </div>
         )}
 
@@ -77,7 +89,7 @@ export default function ProductCard({
       <div className="mt-4 flex-1 flex flex-col justify-between">
         <div>
           <span className="text-[11px] text-[#6C757D] uppercase tracking-wider font-semibold">
-            {product.marca} • {product.categoria}
+            {product.marca} • {translateCategory(product.categoria)}
           </span>
           <h3 className="text-[14px] text-[#1A1A1A] font-medium mt-1 line-clamp-1 group-hover:text-gray-700 transition-colors">
             {product.nombre}
@@ -109,7 +121,7 @@ export default function ProductCard({
             onClick={handleAddToCart}
             className="md:hidden text-[12px] font-bold text-gray-950 hover:text-[#E63946] underline underline-offset-4"
           >
-            + Add
+            + Añadir
           </button>
         </div>
       </div>

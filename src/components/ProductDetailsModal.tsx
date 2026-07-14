@@ -43,14 +43,14 @@ export default function ProductDetailsModal({
   );
   const availableStock = currentVariant ? currentVariant.stock : 0;
 
-  // Materials and care content templates
-  const materialsText = "Woven from 100% GOTS certified organic fibers, utilizing local rainfall irrigation methods and colored with organic water-based dyes. High-density weave offers durable structures with zero skin-irritant synthetics.";
-  const careText = "Machine wash on cold/delicate cycles with phosphate-free liquid detergent. Do not bleach. Tumble dry on minimal heat or hang flat under ambient shade to maintain fiber elasticity.";
-  const shippingText = "Enjoy complimentary premium carbon-neutral home delivery on all purchases above $100. Standard courier dispatches take 2-4 business days. Returns accepted within 30 days of arrival.";
+  // Materials and care content templates (Spanish translations)
+  const materialsText = "Tejido con fibras orgánicas 100% certificadas GOTS, utilizando métodos locales de irrigación por lluvia y teñido con tintes orgánicos a base de agua. Su tejido de alta densidad ofrece una estructura duradera libre de sintéticos que puedan irritar la piel.";
+  const careText = "Lavar a máquina en ciclos fríos y delicados con detergente líquido libre de fosfatos. No usar blanqueador. Secar en secadora a baja temperatura o colgar a la sombra para mantener la elasticidad de las fibras.";
+  const shippingText = "Disfruta de envío a domicilio premium neutro en carbono para compras superiores a $100. Los despachos tardan entre 2 y 4 días hábiles. Se aceptan devoluciones dentro de los 30 días posteriores a la entrega.";
 
   const handleAdd = () => {
     if (availableStock <= 0) {
-      alert("This specific size and color is currently out of stock!");
+      alert("¡Esta combinación de talla y color está agotada actualmente!");
       return;
     }
     onAddToCart(product, quantity, selectedColor, selectedSize);
@@ -65,13 +65,13 @@ export default function ProductDetailsModal({
     <div id="product-details-backdrop" className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
       <div 
         id="product-details-container" 
-        className="bg-white rounded-[32px] max-w-4xl w-full max-h-[90vh] overflow-y-auto relative p-6 md:p-8 flex flex-col md:flex-row gap-8 shadow-2xl"
+        className="bg-white rounded-[32px] max-w-4xl w-full max-h-[90vh] overflow-y-auto relative p-4 sm:p-6 md:p-8 flex flex-col md:flex-row gap-6 md:gap-8 shadow-2xl"
       >
         {/* Close Button */}
         <button
           id="btn-close-details"
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 bg-gray-50 hover:bg-gray-100 rounded-full text-gray-500 hover:text-gray-900 transition-all duration-200 z-10 cursor-pointer"
+          className="absolute top-4 sm:top-6 right-4 sm:right-6 p-2 bg-gray-50 hover:bg-gray-100 rounded-full text-gray-500 hover:text-gray-900 transition-all duration-200 z-10 cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -80,7 +80,7 @@ export default function ProductDetailsModal({
         <div id="details-gallery" className="w-full md:w-1/2 flex flex-col gap-4">
           {/* Breadcrumbs */}
           <nav className="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1">
-            <span className="hover:text-gray-600 cursor-pointer">Store</span>
+            <span className="hover:text-gray-600 cursor-pointer">Tienda</span>
             <span>/</span>
             <span className="hover:text-gray-600 cursor-pointer">{product.categoria}</span>
             <span>/</span>
@@ -189,7 +189,7 @@ export default function ProductDetailsModal({
             {sizes.length > 0 && (
               <div className="mt-5">
                 <span className="text-xs font-bold text-gray-900 block mb-2">
-                  Size: <span className="text-gray-500 font-medium">{selectedSize}</span>
+                  Talla: <span className="text-gray-500 font-medium">{selectedSize}</span>
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {sizes.map((size) => {
@@ -217,12 +217,12 @@ export default function ProductDetailsModal({
               {availableStock > 0 ? (
                 <>
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                  <span className="text-emerald-600">{availableStock} items in stock for this selection</span>
+                  <span className="text-emerald-600">{availableStock} unidades disponibles para esta selección</span>
                 </>
               ) : (
                 <>
                   <span className="w-2 h-2 rounded-full bg-[#E63946]" />
-                  <span className="text-[#E63946]">This combination is currently Sold Out</span>
+                  <span className="text-[#E63946]">Esta combinación se encuentra agotada</span>
                 </>
               )}
             </div>
@@ -263,7 +263,7 @@ export default function ProductDetailsModal({
                 }`}
               >
                 <ShoppingCart className="w-4 h-4" />
-                {availableStock > 0 ? 'Add to Shopping Bag' : 'Sold Out'}
+                {availableStock > 0 ? 'Añadir a la Bolsa' : 'Agotado'}
               </button>
             </div>
 
@@ -276,7 +276,7 @@ export default function ProductDetailsModal({
                   className="w-full flex items-center justify-between text-left py-2.5 text-xs font-bold text-gray-800 hover:text-gray-900"
                 >
                   <span className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-gray-400" /> Materials & Ethics
+                    <ShieldCheck className="w-4 h-4 text-gray-400" /> Materiales y Ética
                   </span>
                   {activeAccordion === 'materials' ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                 </button>
@@ -294,7 +294,7 @@ export default function ProductDetailsModal({
                   className="w-full flex items-center justify-between text-left py-2.5 text-xs font-bold text-gray-800 hover:text-gray-900"
                 >
                   <span className="flex items-center gap-2">
-                    <RefreshCw className="w-4 h-4 text-gray-400" /> Care Instructions
+                    <RefreshCw className="w-4 h-4 text-gray-400" /> Instrucciones de Cuidado
                   </span>
                   {activeAccordion === 'care' ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                 </button>
@@ -312,7 +312,7 @@ export default function ProductDetailsModal({
                   className="w-full flex items-center justify-between text-left py-2.5 text-xs font-bold text-gray-800 hover:text-gray-900"
                 >
                   <span className="flex items-center gap-2">
-                    <Truck className="w-4 h-4 text-gray-400" /> Shipping & Free Returns
+                    <Truck className="w-4 h-4 text-gray-400" /> Envío y Devoluciones Gratis
                   </span>
                   {activeAccordion === 'shipping' ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                 </button>

@@ -75,7 +75,7 @@ export default function CartDrawer({
       setCouponSuccess(true);
       setCouponText('');
     } else {
-      setCouponError('Invalid, expired or unapplicable coupon code.');
+      setCouponError('Código de cupón inválido, vencido o no aplicable.');
     }
   };
 
@@ -93,13 +93,13 @@ export default function CartDrawer({
       {/* Cart Container */}
       <div 
         id="cart-drawer-container" 
-        className="relative w-full max-w-md bg-white h-screen flex flex-col justify-between shadow-2xl p-8 z-50 rounded-l-[24px]"
+        className="relative w-full max-w-full sm:max-w-md bg-white h-screen flex flex-col justify-between shadow-2xl p-6 sm:p-8 z-50 rounded-none sm:rounded-l-[24px]"
         style={{ animation: 'slideLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}
       >
         {/* Header */}
         <div id="cart-drawer-header" className="flex items-center justify-between pb-5 border-b border-gray-100">
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-[#1A1A1A] tracking-tighter">Shopping Bag</h2>
+            <h2 className="text-lg font-bold text-[#1A1A1A] tracking-tighter">Bolsa de Compras</h2>
             <span className="bg-[#F2F2F5] text-[#1A1A1A] text-[10px] font-bold px-2 py-0.5 rounded-full">
               {cartItems.length}
             </span>
@@ -118,13 +118,13 @@ export default function CartDrawer({
           {cartItems.length === 0 ? (
             <div id="empty-cart-state" className="h-64 flex flex-col items-center justify-center text-center p-6">
               <span className="text-3xl mb-3">🛍️</span>
-              <p className="text-xs font-bold text-[#1A1A1A]">Your shopping bag is empty</p>
-              <p className="text-[11px] text-[#6C757D] mt-1 max-w-[200px]">Add some minimal items from the explore page to check out.</p>
+              <p className="text-xs font-bold text-[#1A1A1A]">Tu bolsa de compras está vacía</p>
+              <p className="text-[11px] text-[#6C757D] mt-1 max-w-[200px]">Agrega algunos artículos minimalistas para iniciar tu compra.</p>
               <button 
                 onClick={onClose}
                 className="mt-4 px-5 py-2.5 bg-[#1A1A1A] text-white rounded-[12px] text-xs font-semibold hover:bg-[#E63946] transition-colors cursor-pointer"
               >
-                Continue Exploring
+                Continuar Explorando
               </button>
             </div>
           ) : (
@@ -205,7 +205,7 @@ export default function CartDrawer({
                 <Ticket className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder={appliedCoupon ? `Applied: ${appliedCoupon.id}` : "Promo Coupon ..."}
+                  placeholder={appliedCoupon ? `Aplicado: ${appliedCoupon.id}` : "Cupón Promocional..."}
                   value={couponText}
                   disabled={!!appliedCoupon}
                   onChange={(e) => setCouponText(e.target.value)}
@@ -219,7 +219,7 @@ export default function CartDrawer({
                   onClick={handleRemoveCouponClick}
                   className="px-3.5 bg-red-50 hover:bg-red-100 text-[#E63946] border border-red-100 rounded-[12px] text-xs font-bold transition-all cursor-pointer"
                 >
-                  Remove
+                  Quitar
                 </button>
               ) : (
                 <button
@@ -227,7 +227,7 @@ export default function CartDrawer({
                   type="submit"
                   className="px-3.5 bg-[#1A1A1A] hover:bg-black text-white rounded-[12px] text-xs font-bold transition-all duration-300 cursor-pointer"
                 >
-                  Apply
+                  Aplicar
                 </button>
               )}
             </form>
@@ -236,7 +236,7 @@ export default function CartDrawer({
             {couponError && <p className="text-[10px] font-semibold text-[#E63946]">{couponError}</p>}
             {couponSuccess && (
               <p className="text-[10px] font-bold text-emerald-600 flex items-center gap-1">
-                <Check className="w-3 h-3" /> Coupon applied successfully!
+                <Check className="w-3 h-3" /> ¡Cupón aplicado correctamente!
               </p>
             )}
 
@@ -248,12 +248,12 @@ export default function CartDrawer({
               </div>
               {appliedCoupon && (
                 <div className="flex justify-between text-emerald-600 font-bold">
-                  <span>Coupon Discount ({appliedCoupon.id})</span>
+                  <span>Descuento de Cupón ({appliedCoupon.id})</span>
                   <span>-${discountAmount}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm font-black text-[#1A1A1A] border-t border-gray-100 pt-2.5">
-                <span>Estimated Total</span>
+                <span>Total Estimado</span>
                 <span>${finalTotal}</span>
               </div>
             </div>
@@ -264,7 +264,7 @@ export default function CartDrawer({
               onClick={onCheckout}
               className="w-full h-12 bg-[#1A1A1A] hover:bg-black text-white rounded-[16px] text-xs font-bold transition-all duration-300 shadow-md flex items-center justify-center gap-2 cursor-pointer"
             >
-              Proceed to Checkout
+              Proceder al Pago
             </button>
           </div>
         )}

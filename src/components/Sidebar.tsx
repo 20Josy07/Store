@@ -12,7 +12,8 @@ import {
   Dumbbell, 
   ShoppingBag, 
   HelpCircle,
-  Settings
+  Settings,
+  X
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -21,6 +22,8 @@ interface SidebarProps {
   isAdminUser: boolean;
   currentPage: string;
   onNavigate: (page: string) => void;
+  isOpenOnMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export default function Sidebar({
@@ -28,45 +31,58 @@ export default function Sidebar({
   onCategoryChange,
   isAdminUser,
   currentPage,
-  onNavigate
+  onNavigate,
+  isOpenOnMobile = false,
+  onCloseMobile
 }: SidebarProps) {
   
   const exploreItems = [
-    { label: "New in", value: "New in", icon: Sparkles },
-    { label: "Clothing", value: "Clothing", icon: Shirt },
-    { label: "Shoes", value: "Shoes", icon: Footprints },
-    { label: "Accessories", value: "Accessories", icon: Watch },
-    { label: "ActiveWear", value: "ActiveWear", icon: Dumbbell },
+    { label: "Novedades", value: "New in", icon: Sparkles },
+    { label: "Ropa", value: "Clothing", icon: Shirt },
+    { label: "Calzado", value: "Shoes", icon: Footprints },
+    { label: "Accesorios", value: "Accessories", icon: Watch },
+    { label: "Deporte", value: "ActiveWear", icon: Dumbbell },
     { label: "Outlet", value: "Outlet", icon: ShoppingBag },
   ];
 
   const handleItemClick = (value: string) => {
     onCategoryChange(value);
     onNavigate('home');
+    if (onCloseMobile) onCloseMobile();
   };
 
   return (
     <aside 
       id="storefront-sidebar" 
-      className="fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-100 flex flex-col justify-between p-8 z-30"
+      className={`fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-100 flex flex-col justify-between p-8 z-40 transition-transform duration-300 ${
+        isOpenOnMobile ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}
       style={{ boxShadow: '0px 10px 30px rgba(0,0,0,0.01)' }}
     >
       <div>
         {/* Logo Section */}
         <div 
           id="sidebar-logo" 
-          onClick={() => { onNavigate('home'); onCategoryChange('New in'); }}
-          className="cursor-pointer mb-12 flex items-center gap-2"
+          onClick={() => { onNavigate('home'); onCategoryChange('New in'); if (onCloseMobile) onCloseMobile(); }}
+          className="cursor-pointer mb-12 flex items-center justify-between gap-2"
         >
           <span className="font-sans font-bold text-2xl tracking-tighter text-[#1A1A1A] select-none">
             SLATE.
           </span>
+          {onCloseMobile && (
+            <button 
+              onClick={(e) => { e.stopPropagation(); onCloseMobile(); }}
+              className="lg:hidden p-1.5 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-900 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Explore Navigation Group */}
         <div id="sidebar-explore-group">
           <p className="text-[11px] font-semibold text-[#6C757D] uppercase tracking-wider mb-6 px-1">
-            Explore
+            Explorar
           </p>
           <nav className="space-y-2">
             {exploreItems.map((item) => {
@@ -95,11 +111,11 @@ export default function Sidebar({
         {isAdminUser && (
           <div id="sidebar-admin-group" className="mt-8 border-t border-gray-100 pt-4">
             <p className="text-[11px] font-semibold text-[#6C757D] uppercase tracking-wider mb-2 px-1">
-              Management
+              Administración
             </p>
             <button
               id="btn-nav-admin"
-              onClick={() => onNavigate('admin')}
+              onClick={() => { onNavigate('admin'); if (onCloseMobile) onCloseMobile(); }}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-[16px] text-[14px] font-semibold transition-all duration-200 cursor-pointer ${
                 currentPage === 'admin'
                   ? 'bg-red-50 text-[#E63946]'
@@ -107,7 +123,7 @@ export default function Sidebar({
               }`}
             >
               <Settings className="w-4 h-4 text-red-400" />
-              Admin Portal
+              Portal de Admin
             </button>
           </div>
         )}
@@ -117,11 +133,11 @@ export default function Sidebar({
       <div id="sidebar-help-center" className="mt-auto">
         <button 
           id="btn-help-center"
-          onClick={() => alert("Help Center: Direct chat is active! How can we assist you today? You can contact us at support@slate.com")}
+          onClick={() => alert("Centro de Ayuda: ¡El chat en vivo está activo! ¿Cómo podemos ayudarte hoy? Puedes escribirnos a support@slate.com")}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-[16px] text-[14px] font-semibold text-[#6C757D] hover:text-[#1A1A1A] hover:bg-gray-50 transition-all duration-200 cursor-pointer"
         >
           <HelpCircle className="w-4 h-4 text-gray-400" />
-          Help Center
+          Centro de Ayuda
         </button>
       </div>
     </aside>

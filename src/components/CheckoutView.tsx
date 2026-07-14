@@ -77,11 +77,11 @@ export default function CheckoutView({
   // Address form validation
   const validateAddress = (): boolean => {
     if (!address.nombre.trim() || !address.email.trim() || !address.direccion.trim() || !address.ciudad.trim() || !address.codigo_postal.trim() || !address.telefono.trim()) {
-      setFormErrors('Please fill in all the shipping address fields.');
+      setFormErrors('Por favor, completa todos los campos de la dirección de envío.');
       return false;
     }
     if (!address.email.includes('@')) {
-      setFormErrors('Please enter a valid email address.');
+      setFormErrors('Por favor, ingresa un correo electrónico válido.');
       return false;
     }
     setFormErrors('');
@@ -91,15 +91,15 @@ export default function CheckoutView({
   // Card validation
   const validateCard = (): boolean => {
     if (!card.name.trim() || !card.number.trim() || !card.expiry.trim() || !card.cvv.trim()) {
-      setFormErrors('Please fill in all your payment credentials.');
+      setFormErrors('Por favor, completa todos tus datos de pago.');
       return false;
     }
     if (card.number.replace(/\s+/g, '').length < 16) {
-      setFormErrors('Card number must be 16 digits.');
+      setFormErrors('El número de tarjeta debe tener 16 dígitos.');
       return false;
     }
     if (card.cvv.length < 3) {
-      setFormErrors('CVV must be 3 or 4 digits.');
+      setFormErrors('El CVV debe tener 3 o 4 dígitos.');
       return false;
     }
     setFormErrors('');
@@ -150,23 +150,23 @@ export default function CheckoutView({
       onClearCart();
       setStep(4);
     } catch (err) {
-      setFormErrors('Failed to dispatch order. Check your internet connection.');
+      setFormErrors('No se pudo procesar el pedido. Verifica tu conexión a internet.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div id="checkout-view" className="ml-64 p-8 bg-gray-50 min-h-screen">
+    <div id="checkout-view" className="lg:ml-64 ml-0 px-4 md:px-8 py-8 bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto">
         
         {/* Progress Stepper bar */}
         <div id="checkout-stepper" className="flex items-center justify-between mb-8 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
           {[
-            { s: 1, label: 'Summary', icon: ShoppingBag },
-            { s: 2, label: 'Shipping', icon: MapPin },
-            { s: 3, label: 'Payment', icon: CreditCard },
-            { s: 4, label: 'Receipt', icon: CheckCircle2 }
+            { s: 1, label: 'Resumen', icon: ShoppingBag },
+            { s: 2, label: 'Envío', icon: MapPin },
+            { s: 3, label: 'Pago', icon: CreditCard },
+            { s: 4, label: 'Recibo', icon: CheckCircle2 }
           ].map((item) => {
             const Icon = item.icon;
             const isCompleted = step > item.s;
@@ -199,7 +199,7 @@ export default function CheckoutView({
           {/* STEP 1: SUMMARY */}
           {step === 1 && (
             <div className="lg:col-span-3 bg-white p-6 md:p-8 rounded-[32px] border border-gray-100 shadow-sm">
-              <h2 className="text-lg font-black text-gray-950 mb-6">Review your Order Summary</h2>
+              <h2 className="text-lg font-black text-gray-950 mb-6">Revisa el Resumen de tu Pedido</h2>
               
               <div className="space-y-4 border-b border-gray-100 pb-6 mb-6">
                 {cartItems.map((item, idx) => {
@@ -215,7 +215,7 @@ export default function CheckoutView({
                       <div className="flex-1">
                         <h4 className="text-xs font-bold text-gray-950">{item.producto.nombre}</h4>
                         <p className="text-[10px] text-gray-400 font-semibold uppercase mt-0.5">
-                          Size: {item.talla_seleccionada} / Color: {item.color_seleccionado}
+                          Talla: {item.talla_seleccionada} / Color: {item.color_seleccionado}
                         </p>
                         <p className="text-xs font-semibold text-gray-500 mt-1">
                           ${price} x {item.cantidad}
@@ -232,17 +232,17 @@ export default function CheckoutView({
               {/* Pricing breakdown */}
               <div className="space-y-2 text-xs font-semibold text-gray-500 mb-6">
                 <div className="flex justify-between">
-                  <span>Cart Subtotal</span>
+                  <span>Subtotal del Carrito</span>
                   <span className="text-gray-950">${subtotal}</span>
                 </div>
                 {appliedCoupon && (
                   <div className="flex justify-between text-emerald-600 font-bold">
-                    <span>Discount Coupon ({appliedCoupon.id})</span>
+                    <span>Cupón de Descuento ({appliedCoupon.id})</span>
                     <span>-${discountAmount}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm font-black text-gray-950 border-t border-gray-100 pt-3">
-                  <span>Order Total</span>
+                  <span>Total del Pedido</span>
                   <span>${finalTotal}</span>
                 </div>
               </div>
@@ -252,14 +252,14 @@ export default function CheckoutView({
                   onClick={onNavigateHome}
                   className="px-6 py-3 border border-gray-200 text-gray-500 rounded-2xl text-xs font-bold hover:text-gray-900 hover:border-gray-900 transition-colors cursor-pointer"
                 >
-                  Return to Store
+                  Volver a la Tienda
                 </button>
                 <button
                   id="btn-checkout-to-shipping"
                   onClick={handleNextStep}
                   className="px-6 py-3 bg-gray-900 hover:bg-[#E63946] text-white rounded-2xl text-xs font-bold transition-all duration-300 shadow"
                 >
-                  Confirm Items & Next
+                  Confirmar Artículos y Continuar
                 </button>
               </div>
             </div>
@@ -268,11 +268,11 @@ export default function CheckoutView({
           {/* STEP 2: SHIPPING ADDRESS */}
           {step === 2 && (
             <div className="lg:col-span-3 bg-white p-6 md:p-8 rounded-[32px] border border-gray-100 shadow-sm">
-              <h2 className="text-lg font-black text-gray-950 mb-6">Enter Dispatch Shipping Address</h2>
+              <h2 className="text-lg font-black text-gray-950 mb-6">Ingresa la Dirección de Envío</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Full Name</label>
+                  <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Nombre Completo</label>
                   <input
                     type="text"
                     value={address.nombre}
@@ -282,7 +282,7 @@ export default function CheckoutView({
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Contact Email</label>
+                  <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Correo Electrónico de Contacto</label>
                   <input
                     type="email"
                     value={address.email}
@@ -292,7 +292,7 @@ export default function CheckoutView({
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Delivery Address</label>
+                  <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Dirección de Entrega</label>
                   <input
                     type="text"
                     value={address.direccion}
@@ -302,7 +302,7 @@ export default function CheckoutView({
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">City</label>
+                  <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Ciudad</label>
                   <input
                     type="text"
                     value={address.ciudad}
@@ -312,7 +312,7 @@ export default function CheckoutView({
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Postal / Zip Code</label>
+                  <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Código Postal</label>
                   <input
                     type="text"
                     value={address.codigo_postal}
@@ -322,7 +322,7 @@ export default function CheckoutView({
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Phone Number</label>
+                  <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Número de Teléfono</label>
                   <input
                     type="tel"
                     value={address.telefono}
@@ -340,14 +340,14 @@ export default function CheckoutView({
                   onClick={() => setStep(1)}
                   className="px-6 py-3 border border-gray-200 text-gray-500 rounded-2xl text-xs font-bold hover:text-gray-900 hover:border-gray-900 transition-colors cursor-pointer"
                 >
-                  Back to Summary
+                  Volver al Resumen
                 </button>
                 <button
                   id="btn-checkout-to-payment"
                   onClick={handleNextStep}
                   className="px-6 py-3 bg-gray-900 hover:bg-[#E63946] text-white rounded-2xl text-xs font-bold transition-all duration-300 shadow"
                 >
-                  Continue to Payment
+                  Continuar al Pago
                 </button>
               </div>
             </div>
@@ -359,11 +359,11 @@ export default function CheckoutView({
               {/* Payment Card Customizer */}
               <div className="lg:col-span-2 bg-white p-6 md:p-8 rounded-[32px] border border-gray-100 shadow-sm flex flex-col justify-between">
                 <div>
-                  <h2 className="text-lg font-black text-gray-950 mb-6">Payment Card Details</h2>
+                  <h2 className="text-lg font-black text-gray-950 mb-6">Detalles de la Tarjeta de Pago</h2>
                   
                   <form onSubmit={handleCompleteOrder} className="space-y-4">
                     <div>
-                      <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Cardholder Name</label>
+                      <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Nombre del Titular</label>
                       <input
                         type="text"
                         value={card.name}
@@ -373,7 +373,7 @@ export default function CheckoutView({
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Card Number</label>
+                      <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Número de Tarjeta</label>
                       <input
                         type="text"
                         value={card.number}
@@ -395,7 +395,7 @@ export default function CheckoutView({
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Expiration Date</label>
+                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Fecha de Expiración</label>
                         <input
                           type="text"
                           value={card.expiry}
@@ -412,7 +412,7 @@ export default function CheckoutView({
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Security Code (CVV)</label>
+                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Código de Seguridad (CVV)</label>
                         <input
                           type="password"
                           value={card.cvv}
@@ -433,7 +433,7 @@ export default function CheckoutView({
                     onClick={() => setStep(2)}
                     className="px-6 py-3 border border-gray-200 text-gray-500 rounded-2xl text-xs font-bold hover:text-gray-900 hover:border-gray-900 transition-colors cursor-pointer"
                   >
-                    Back to Shipping
+                    Volver al Envío
                   </button>
                   <button
                     id="btn-place-order"
@@ -441,7 +441,7 @@ export default function CheckoutView({
                     disabled={isSubmitting}
                     className="px-6 py-3 bg-gray-900 hover:bg-[#E63946] text-white rounded-2xl text-xs font-bold transition-all duration-300 shadow flex items-center gap-2"
                   >
-                    {isSubmitting ? 'Verifying...' : `Pay $${finalTotal}`}
+                    {isSubmitting ? 'Verificando...' : `Pagar $${finalTotal}`}
                   </button>
                 </div>
               </div>
@@ -462,13 +462,13 @@ export default function CheckoutView({
 
                   <div className="flex justify-between items-end mt-8 border-t border-white/10 pt-4">
                     <div>
-                      <span className="text-[8px] uppercase tracking-wider opacity-40 font-semibold block">Cardholder</span>
+                      <span className="text-[8px] uppercase tracking-wider opacity-40 font-semibold block">Titular</span>
                       <span className="text-xs tracking-wider uppercase font-bold max-w-[120px] truncate block">
                         {card.name || 'JANE DOE'}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[8px] uppercase tracking-wider opacity-40 font-semibold block">Expires</span>
+                      <span className="text-[8px] uppercase tracking-wider opacity-40 font-semibold block">Vence</span>
                       <span className="text-xs font-bold">{card.expiry || 'MM/YY'}</span>
                     </div>
                   </div>
@@ -476,13 +476,13 @@ export default function CheckoutView({
 
                 {/* Short review box */}
                 <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
-                  <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-3 border-b border-gray-50 pb-2">Delivery Summary</h3>
+                  <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-3 border-b border-gray-50 pb-2">Resumen de Entrega</h3>
                   <div className="space-y-1.5 text-xs text-gray-500 font-semibold">
                     <p className="text-gray-900">{address.nombre}</p>
                     <p className="truncate">{address.direccion}</p>
                     <p>{address.ciudad}, {address.codigo_postal}</p>
                     <p className="pt-2 border-t border-gray-50 text-gray-900 mt-2 font-black flex justify-between">
-                      <span>Total to charge:</span>
+                      <span>Total a cobrar:</span>
                       <span>${finalTotal}</span>
                     </p>
                   </div>
@@ -498,31 +498,31 @@ export default function CheckoutView({
                 <CheckCircle2 className="w-10 h-10" />
               </div>
               
-              <h2 className="text-2xl font-black text-gray-950 tracking-tight leading-none mb-2">Order Confirmed!</h2>
+              <h2 className="text-2xl font-black text-gray-950 tracking-tight leading-none mb-2">¡Pedido Confirmado!</h2>
               <p className="text-xs text-gray-500 max-w-sm mx-auto mb-6">
-                Thank you for purchasing at SLATE. Your order has been registered in our systems and is already in processing.
+                Gracias por comprar en SLATE. Tu pedido ha sido registrado en nuestros sistemas y ya se encuentra en proceso.
               </p>
 
               <div className="bg-gray-50 border border-gray-100 p-5 rounded-2xl text-left max-w-md w-full space-y-3 font-semibold mb-8">
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>Order Reference ID:</span>
+                  <span>ID de Referencia del Pedido:</span>
                   <span className="text-gray-900 font-bold">{createdOrderId}</span>
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>Receiver:</span>
+                  <span>Destinatario:</span>
                   <span className="text-gray-900">{address.nombre}</span>
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
-                  <span>Delivery Address:</span>
+                  <span>Dirección de Entrega:</span>
                   <span className="text-gray-900 max-w-[200px] truncate text-right">{address.direccion}</span>
                 </div>
                 <div className="flex justify-between text-xs text-[#E63946] font-bold">
-                  <span>Total Paid:</span>
+                  <span>Total Pagado:</span>
                   <span>${finalTotal}</span>
                 </div>
                 <div className="pt-3 border-t border-gray-200 flex justify-between text-xs text-emerald-600 font-extrabold">
-                  <span>Estimated Delivery:</span>
-                  <span>2-4 Business Days</span>
+                  <span>Entrega Estimada:</span>
+                  <span>2-4 Días Hábiles</span>
                 </div>
               </div>
 
@@ -533,7 +533,7 @@ export default function CheckoutView({
                   className="px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-2xl text-xs font-bold transition-all duration-300 shadow flex items-center gap-2 cursor-pointer"
                 >
                   <Home className="w-4 h-4" />
-                  Back to Store
+                  Volver a la Tienda
                 </button>
               </div>
             </div>

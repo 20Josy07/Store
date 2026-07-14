@@ -22,7 +22,6 @@ service cloudfirestore {
 
     function isAdmin() {
       return isSignedIn() && (
-        request.auth.token.email == 'josyacosta07@gmail.com' || 
         get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.esAdmin == true
       );
     }
@@ -97,10 +96,10 @@ service cloudfirestore {
     match /usuarios/{userId} {
       allow read: if isSignedIn();
       allow create: if isUser(userId) && isValidUsuario(incoming()) && (
-        incoming().esAdmin == false || request.auth.token.email == 'josyacosta07@gmail.com'
+        incoming().esAdmin == false
       );
       allow update: if isUser(userId) && isValidUsuario(incoming()) && (
-        incoming().esAdmin == existing().esAdmin || request.auth.token.email == 'josyacosta07@gmail.com' // Block privilege self-escalation except for bootstrapped admin
+        incoming().esAdmin == existing().esAdmin // Block privilege self-escalation
       );
       allow delete: if isAdmin();
     }

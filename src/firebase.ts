@@ -32,19 +32,11 @@ import {
   getDocFromServer
 } from 'firebase/firestore';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBG0g6k04sjOAWCyd1wa9zKg_zIN_W9ylA",
-  authDomain: "store-e49d3.firebaseapp.com",
-  projectId: "store-e49d3",
-  storageBucket: "store-e49d3.firebasestorage.app",
-  messagingSenderId: "847915640214",
-  appId: "1:847915640214:web:1fcb5fe05e649327ff69b7",
-  measurementId: "G-556YTY5DPT"
-};
+import firebaseConfig from '../firebase-applet-config.json';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
@@ -113,20 +105,9 @@ export async function syncUserProfile(user: User, customNombre?: string): Promis
   const userDocRef = doc(db, 'usuarios', user.uid);
   try {
     const userSnapshot = await getDoc(userDocRef);
-    const isBootstrappedAdmin = user.email === 'josyacosta07@gmail.com';
     
     if (userSnapshot.exists()) {
       const data = userSnapshot.data();
-      // If we need to update esAdmin for bootstrapped admin or sync fields
-      if (isBootstrappedAdmin && !data.esAdmin) {
-        await updateDoc(userDocRef, { esAdmin: true });
-        return {
-          uid: user.uid,
-          email: user.email || '',
-          nombre: customNombre || data.nombre || user.displayName || 'Client',
-          esAdmin: true
-        };
-      }
       // If customNombre is provided and different, we update it
       if (customNombre && customNombre !== data.nombre) {
         await updateDoc(userDocRef, { nombre: customNombre });
@@ -149,7 +130,7 @@ export async function syncUserProfile(user: User, customNombre?: string): Promis
         uid: user.uid,
         email: user.email || '',
         nombre: customNombre || user.displayName || 'Client',
-        esAdmin: isBootstrappedAdmin // Bootstrap user as admin if email matches
+        esAdmin: false
       };
       await setDoc(userDocRef, newProfile);
       return newProfile;
