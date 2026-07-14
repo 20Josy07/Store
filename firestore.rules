@@ -43,10 +43,9 @@ service cloudfirestore {
 
     function isValidUsuario(data) {
       return data.keys().hasAll(['uid', 'email', 'nombre', 'esAdmin']) &&
-             data.keys().size() == 4 &&
              data.uid is string &&
              data.email is string && data.email.size() <= 200 &&
-             data.nombre is string && data.nombre.size() <= 100 &&
+             data.nombre is string && data.nombre.size() <= 300 &&
              data.esAdmin is bool;
     }
 
