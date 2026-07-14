@@ -10,7 +10,7 @@ import { Product, ProductVariant } from '../types';
 interface ProductDetailsModalProps {
   product: Product;
   onClose: () => void;
-  onAddToCart: (product: Product, quantity: number, color: string, size: string) => void;
+  onAddToCart: (product: Product, quantity: number, color: string, size: string) => Promise<boolean> | any;
 }
 
 export default function ProductDetailsModal({
@@ -48,13 +48,15 @@ export default function ProductDetailsModal({
   const careText = "Lavar a máquina en ciclos fríos y delicados con detergente líquido libre de fosfatos. No usar blanqueador. Secar en secadora a baja temperatura o colgar a la sombra para mantener la elasticidad de las fibras.";
   const shippingText = "Disfruta de envío a domicilio premium neutro en carbono para compras superiores a $100. Los despachos tardan entre 2 y 4 días hábiles. Se aceptan devoluciones dentro de los 30 días posteriores a la entrega.";
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (availableStock <= 0) {
       alert("¡Esta combinación de talla y color está agotada actualmente!");
       return;
     }
-    onAddToCart(product, quantity, selectedColor, selectedSize);
-    onClose();
+    const success = await onAddToCart(product, quantity, selectedColor, selectedSize);
+    if (success !== false) {
+      onClose();
+    }
   };
 
   const toggleAccordion = (name: string) => {

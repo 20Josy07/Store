@@ -17,7 +17,8 @@ import {
   deleteDoc,
   query,
   where,
-  orderBy
+  orderBy,
+  runTransaction
 } from '../firebase';
 import { Product, Coupon, Order, HomeBannerConfig } from '../types';
 import { INITIAL_PRODUCTS, INITIAL_COUPONS, DEFAULT_HOME_CONFIG } from './seedData';
@@ -180,9 +181,82 @@ export async function getOrdersFromDB(): Promise<Order[]> {
 export async function createOrderInDB(order: Order): Promise<void> {
   const path = `pedidos/${order.id}`;
   try {
+    // 1. Create the order
     await setDoc(doc(db, 'pedidos', order.id), order);
   } catch (error) {
     handleFirestoreError(error, OperationType.CREATE, path);
+  }
+}
+
+export async function reserveStockInDB(productId: string, color: string, size: string, quantity: number): Promise<boolean> {
+  const productRef = doc(db, 'productos', productId);
+  try {
+    const success = await runTransaction(db, async (transaction) => {
+      const productSnap = await transaction.get(productRef);
+      if (!productSnap.exists()) {
+        throw new Error("El producto no existe");
+      }
+      const productData = productSnap.data() as Product;
+      if (!productData.variantes || !Array.isArray(productData.variantes)) {
+        throw new Error("El producto no tiene variantes configuradas");
+      }
+
+      let hasAvailableStock = false;
+      const updatedVariantes = productData.variantes.map(v => {
+        if (v.color.toLowerCase() === color.toLowerCase() && v.talla.toLowerCase() === size.toLowerCase()) {
+          if (v.stock >= quantity) {
+            hasAvailableStock = true;
+            return {
+              ...v,
+              stock: v.stock - quantity
+            };
+          }
+        }
+        return v;
+      });
+
+      if (!hasAvailableStock) {
+        return false;
+      }
+
+      transaction.update(productRef, { variantes: updatedVariantes });
+      return true;
+    });
+
+    return success;
+  } catch (error) {
+    console.error("Error reserving stock in transaction:", error);
+    return false;
+  }
+}
+
+export async function releaseStockInDB(productId: string, color: string, size: string, quantity: number): Promise<void> {
+  const productRef = doc(db, 'productos', productId);
+  try {
+    await runTransaction(db, async (transaction) => {
+      const productSnap = await transaction.get(productRef);
+      if (!productSnap.exists()) {
+        return;
+      }
+      const productData = productSnap.data() as Product;
+      if (!productData.variantes || !Array.isArray(productData.variantes)) {
+        return;
+      }
+
+      const updatedVariantes = productData.variantes.map(v => {
+        if (v.color.toLowerCase() === color.toLowerCase() && v.talla.toLowerCase() === size.toLowerCase()) {
+          return {
+            ...v,
+            stock: v.stock + quantity
+          };
+        }
+        return v;
+      });
+
+      transaction.update(productRef, { variantes: updatedVariantes });
+    });
+  } catch (error) {
+    console.error("Error releasing stock in transaction:", error);
   }
 }
 

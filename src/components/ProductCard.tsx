@@ -20,9 +20,12 @@ export default function ProductCard({
   onAddToCart
 }: ProductCardProps) {
   const hasDiscount = product.precio_descuento !== null && product.precio_descuento !== undefined;
+  const totalStock = product.variantes ? product.variantes.reduce((acc, v) => acc + v.stock, 0) : 0;
+  const isAgotado = totalStock === 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isAgotado) return;
     onAddToCart(product);
   };
 
@@ -60,7 +63,7 @@ export default function ProductCard({
           src={product.imagenes[0]}
           alt={product.nombre}
           referrerPolicy="no-referrer"
-          className="h-full w-full object-cover object-center transition-all duration-700 group-hover:scale-105 rounded-[16px]"
+          className={`h-full w-full object-cover object-center transition-all duration-700 group-hover:scale-105 rounded-[16px] ${isAgotado ? 'opacity-40 grayscale-[30%]' : ''}`}
         />
 
         {/* Brand Tag overlay */}
@@ -69,20 +72,31 @@ export default function ProductCard({
         </div>
 
         {/* Promo tag if discount */}
-        {hasDiscount && (
+        {hasDiscount && !isAgotado && (
           <div className="absolute top-4 right-4 bg-[#E63946] text-white px-3 py-1.5 rounded-full shadow-sm text-[10px] font-extrabold tracking-wider animate-pulse">
             OFERTA
           </div>
         )}
 
+        {/* AGOTADO elegant overlay */}
+        {isAgotado && (
+          <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px] flex items-center justify-center rounded-[16px] z-10">
+            <span className="bg-black/80 text-white border border-white/20 px-4 py-2 rounded-full text-[10px] font-black tracking-widest uppercase shadow-md">
+              Agotado
+            </span>
+          </div>
+        )}
+
         {/* Hover quick add floating bag button (elegant white circle with shadow) */}
-        <button
-          id={`btn-quick-add-${product.id}`}
-          onClick={handleAddToCart}
-          className="absolute bottom-4 right-4 w-10 h-10 bg-white hover:text-[#E63946] text-gray-900 rounded-full flex items-center justify-center shadow-lg transform translate-y-12 group-hover:translate-y-0 transition-all duration-300 opacity-0 md:group-hover:opacity-100 cursor-pointer hover:scale-105 active:scale-95"
-        >
-          <ShoppingCart className="w-4 h-4 text-[#1A1A1A]" />
-        </button>
+        {!isAgotado && (
+          <button
+            id={`btn-quick-add-${product.id}`}
+            onClick={handleAddToCart}
+            className="absolute bottom-4 right-4 w-10 h-10 bg-white hover:text-[#E63946] text-gray-900 rounded-full flex items-center justify-center shadow-lg transform translate-y-12 group-hover:translate-y-0 transition-all duration-300 opacity-0 md:group-hover:opacity-100 cursor-pointer hover:scale-105 active:scale-95"
+          >
+            <ShoppingCart className="w-4 h-4 text-[#1A1A1A]" />
+          </button>
+        )}
       </div>
 
       {/* Product Meta Info */}
@@ -116,13 +130,19 @@ export default function ProductCard({
           </div>
 
           {/* Quick Add link (Visible on mobile/tablet) */}
-          <button 
-            id={`btn-mobile-add-${product.id}`}
-            onClick={handleAddToCart}
-            className="md:hidden text-[12px] font-bold text-gray-950 hover:text-[#E63946] underline underline-offset-4"
-          >
-            + Añadir
-          </button>
+          {isAgotado ? (
+            <span className="text-[10px] font-bold text-[#E63946] uppercase tracking-widest bg-red-50 px-2.5 py-1 rounded-full border border-red-100">
+              Agotado
+            </span>
+          ) : (
+            <button 
+              id={`btn-mobile-add-${product.id}`}
+              onClick={handleAddToCart}
+              className="md:hidden text-[12px] font-bold text-gray-950 hover:text-[#E63946] underline underline-offset-4"
+            >
+              + Añadir
+            </button>
+          )}
         </div>
       </div>
     </div>

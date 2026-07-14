@@ -29,7 +29,9 @@ import {
   deleteCouponFromDB,
   createOrderInDB,
   updateOrderStatusInDB,
-  updateHomeConfigInDB
+  updateHomeConfigInDB,
+  reserveStockInDB,
+  releaseStockInDB
 } from './data/dbHelpers';
 import { Product, Coupon, Order, CartItem, UserProfile, HomeBannerConfig } from './types';
 import Sidebar from './components/Sidebar';
@@ -187,6 +189,28 @@ export default function App() {
     localStorage.setItem('slate_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
+  // --- RELEASE STOCK ON UNLOAD TO PREVENT STOCK LOCKING ---
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const savedCart = localStorage.getItem('slate_cart');
+      if (savedCart) {
+        try {
+          const items: CartItem[] = JSON.parse(savedCart);
+          items.forEach(item => {
+            releaseStockInDB(item.producto.id, item.color_seleccionado, item.talla_seleccionada, item.cantidad);
+          });
+          localStorage.removeItem('slate_cart');
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
   // --- AUTH TRIGGERS ---
   const handleSignIn = () => {
     setIsAuthModalOpen(true);
@@ -203,10 +227,16 @@ export default function App() {
   };
 
   // --- CART CONTROLS ---
-  const handleAddToCart = (product: Product, quantity = 1, color = '', size = '') => {
+  const handleAddToCart = async (product: Product, quantity = 1, color = '', size = '') => {
     // If no specific color or size provided, take the first available from variants
     const selectedColor = color || (product.variantes[0] ? product.variantes[0].color : 'Standard');
     const selectedSize = size || (product.variantes[0] ? product.variantes[0].talla : 'One-Size');
+
+    const success = await reserveStockInDB(product.id, selectedColor, selectedSize, quantity);
+    if (!success) {
+      alert(`⚠️ ¡Lo sentimos! No queda suficiente stock de ${product.nombre} (${selectedColor} - Talla ${selectedSize}) disponible para reservar.`);
+      return;
+    }
 
     const existingIndex = cartItems.findIndex(
       item => item.producto.id === product.id && 
@@ -214,33 +244,60 @@ export default function App() {
               item.talla_seleccionada === selectedSize
     );
 
+    let updatedCart: CartItem[] = [];
     if (existingIndex > -1) {
       const list = [...cartItems];
       list[existingIndex].cantidad += quantity;
-      setCartItems(list);
+      updatedCart = list;
     } else {
-      setCartItems([...cartItems, {
+      updatedCart = [...cartItems, {
         producto: product,
         cantidad: quantity,
         color_seleccionado: selectedColor,
         talla_seleccionada: selectedSize
-      }]);
+      }];
     }
+    
+    setCartItems(updatedCart);
+    localStorage.setItem('slate_cart', JSON.stringify(updatedCart));
     
     // Auto feedback
     setIsCartOpen(true);
   };
 
-  const handleUpdateQuantity = (idx: number, quantity: number) => {
+  const handleUpdateQuantity = async (idx: number, quantity: number) => {
     const list = [...cartItems];
+    const item = list[idx];
+    const oldQuantity = item.cantidad;
+    const diff = quantity - oldQuantity;
+
+    if (diff > 0) {
+      // Trying to add more quantity -> Reserve more stock
+      const success = await reserveStockInDB(item.producto.id, item.color_seleccionado, item.talla_seleccionada, diff);
+      if (!success) {
+        alert(`⚠️ ¡Lo sentimos! No queda suficiente stock disponible para aumentar la cantidad.`);
+        return;
+      }
+    } else if (diff < 0) {
+      // Decreasing quantity -> Release stock
+      await releaseStockInDB(item.producto.id, item.color_seleccionado, item.talla_seleccionada, Math.abs(diff));
+    }
+
     list[idx].cantidad = quantity;
     setCartItems(list);
+    localStorage.setItem('slate_cart', JSON.stringify(list));
   };
 
-  const handleRemoveItem = (idx: number) => {
+  const handleRemoveItem = async (idx: number) => {
     const list = [...cartItems];
+    const item = list[idx];
+    
+    // Release the stock
+    await releaseStockInDB(item.producto.id, item.color_seleccionado, item.talla_seleccionada, item.cantidad);
+
     list.splice(idx, 1);
     setCartItems(list);
+    localStorage.setItem('slate_cart', JSON.stringify(list));
   };
 
   // --- DISCOUNTS COUPON EVALUATION ---

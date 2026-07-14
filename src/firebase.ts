@@ -29,7 +29,8 @@ import {
   onSnapshot,
   limit,
   orderBy,
-  getDocFromServer
+  getDocFromServer,
+  runTransaction
 } from 'firebase/firestore';
 
 import firebaseConfig from '../firebase-applet-config.json';
@@ -154,6 +155,7 @@ export {
   onSnapshot, 
   limit, 
   orderBy,
+  runTransaction,
   signInWithPopup,
   signOut,
   onAuthStateChanged,
