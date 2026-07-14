@@ -1,0 +1,96 @@
+{
+  "entities": {
+    "Usuario": {
+      "title": "Usuario",
+      "description": "User profile with roles and privileges",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Auth user ID" },
+        "email": { "type": "string", "description": "User email address" },
+        "nombre": { "type": "string", "description": "Display name" },
+        "esAdmin": { "type": "boolean", "description": "Whether user has admin access" }
+      },
+      "required": ["uid", "email", "nombre", "esAdmin"]
+    },
+    "Producto": {
+      "title": "Producto",
+      "description": "Store catalog item",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "nombre": { "type": "string" },
+        "marca": { "type": "string" },
+        "categoria": { "type": "string" },
+        "genero": { "type": "string" },
+        "precio_regular": { "type": "number" },
+        "precio_descuento": { "type": "number" },
+        "imagenes": { "type": "array" },
+        "descripcion": { "type": "string" },
+        "variantes": { "type": "array" }
+      },
+      "required": ["id", "nombre", "marca", "categoria", "genero", "precio_regular", "imagenes", "descripcion", "variantes"]
+    },
+    "Pedido": {
+      "title": "Pedido",
+      "description": "Customer purchase order",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "usuario_id": { "type": "string" },
+        "items": { "type": "array" },
+        "total": { "type": "number" },
+        "estado": { "type": "string" },
+        "fecha_creacion": { "type": "string" },
+        "direccion_envio": { "type": "object" }
+      },
+      "required": ["id", "usuario_id", "items", "total", "estado", "fecha_creacion", "direccion_envio"]
+    },
+    "Cupon": {
+      "title": "Cupon",
+      "description": "Promo and discount coupons",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "tipo": { "type": "string" },
+        "valor": { "type": "number" },
+        "fecha_expiracion": { "type": "string" },
+        "categoria_restringida": { "type": "string" }
+      },
+      "required": ["id", "tipo", "valor", "fecha_expiracion"]
+    },
+    "HomeConfig": {
+      "title": "HomeConfig",
+      "description": "CMS Banners configuration for home screen",
+      "type": "object",
+      "properties": {
+        "banner1_texto": { "type": "string" },
+        "banner1_bg": { "type": "string" },
+        "banner2_texto": { "type": "string" },
+        "banner2_bg": { "type": "string" }
+      },
+      "required": ["banner1_texto", "banner1_bg", "banner2_texto", "banner2_bg"]
+    }
+  },
+  "firestore": {
+    "usuarios": {
+      "schema": { "$ref": "#/entities/Usuario" },
+      "description": "User profiles and permissions collection"
+    },
+    "productos": {
+      "schema": { "$ref": "#/entities/Producto" },
+      "description": "Product catalog collection"
+    },
+    "pedidos": {
+      "schema": { "$ref": "#/entities/Pedido" },
+      "description": "E-commerce orders collection"
+    },
+    "cupones": {
+      "schema": { "$ref": "#/entities/Cupon" },
+      "description": "Discount codes collection"
+    },
+    "config": {
+      "schema": { "$ref": "#/entities/HomeConfig" },
+      "description": "Application settings and CMS configurations"
+    }
+  }
+}
