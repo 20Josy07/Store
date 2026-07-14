@@ -95,11 +95,12 @@ service cloudfirestore {
 
     match /usuarios/{userId} {
       allow read: if isSignedIn();
-      allow create: if isUser(userId) && isValidUsuario(incoming()) && (
-        incoming().esAdmin == false
+      allow create: if isUser(userId) && (
+        !incoming().keys().hasAny(['esAdmin']) || incoming().esAdmin == false
       );
-      allow update: if isUser(userId) && isValidUsuario(incoming()) && (
-        incoming().esAdmin == existing().esAdmin // Block privilege self-escalation
+      allow update: if isUser(userId) && (
+        (!incoming().keys().hasAny(['esAdmin']) && !existing().keys().hasAny(['esAdmin'])) ||
+        incoming().esAdmin == existing().esAdmin
       );
       allow delete: if isAdmin();
     }
