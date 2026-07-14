@@ -1,3 +1,4 @@
+import { formatPrice } from "../lib/utils";
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -218,11 +219,11 @@ export default function CheckoutView({
                           Talla: {item.talla_seleccionada} / Color: {item.color_seleccionado}
                         </p>
                         <p className="text-xs font-semibold text-gray-500 mt-1">
-                          ${price} x {item.cantidad}
+                          {formatPrice(price)} x {item.cantidad}
                         </p>
                       </div>
                       <span className="text-xs font-black text-gray-950">
-                        ${price * item.cantidad}
+                        {formatPrice(price * item.cantidad)}
                       </span>
                     </div>
                   );
@@ -233,17 +234,17 @@ export default function CheckoutView({
               <div className="space-y-2 text-xs font-semibold text-gray-500 mb-6">
                 <div className="flex justify-between">
                   <span>Subtotal del Carrito</span>
-                  <span className="text-gray-950">${subtotal}</span>
+                  <span className="text-gray-950">{formatPrice(subtotal)}</span>
                 </div>
                 {appliedCoupon && (
                   <div className="flex justify-between text-emerald-600 font-bold">
                     <span>Cupón de Descuento ({appliedCoupon.id})</span>
-                    <span>-${discountAmount}</span>
+                    <span>-{formatPrice(discountAmount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm font-black text-gray-950 border-t border-gray-100 pt-3">
                   <span>Total del Pedido</span>
-                  <span>${finalTotal}</span>
+                  <span>{formatPrice(finalTotal)}</span>
                 </div>
               </div>
 
@@ -441,7 +442,7 @@ export default function CheckoutView({
                     disabled={isSubmitting}
                     className="px-6 py-3 bg-gray-900 hover:bg-[#E63946] text-white rounded-2xl text-xs font-bold transition-all duration-300 shadow flex items-center gap-2"
                   >
-                    {isSubmitting ? 'Verificando...' : `Pagar $${finalTotal}`}
+                    {isSubmitting ? 'Verificando...' : `Pagar ${formatPrice(finalTotal)}`}
                   </button>
                 </div>
               </div>
@@ -483,7 +484,7 @@ export default function CheckoutView({
                     <p>{address.ciudad}, {address.codigo_postal}</p>
                     <p className="pt-2 border-t border-gray-50 text-gray-900 mt-2 font-black flex justify-between">
                       <span>Total a cobrar:</span>
-                      <span>${finalTotal}</span>
+                      <span>{formatPrice(finalTotal)}</span>
                     </p>
                   </div>
                 </div>
@@ -518,7 +519,7 @@ export default function CheckoutView({
                 </div>
                 <div className="flex justify-between text-xs text-[#E63946] font-bold">
                   <span>Total Pagado:</span>
-                  <span>${finalTotal}</span>
+                  <span>{formatPrice(finalTotal)}</span>
                 </div>
                 <div className="pt-3 border-t border-gray-200 flex justify-between text-xs text-emerald-600 font-extrabold">
                   <span>Entrega Estimada:</span>

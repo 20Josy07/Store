@@ -52,8 +52,16 @@ export default function Sidebar({
   };
 
   return (
-    <aside 
-      id="storefront-sidebar" 
+    <>
+      {/* Mobile Backdrop */}
+      {isOpenOnMobile && (
+        <div 
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 lg:hidden"
+          onClick={onCloseMobile}
+        />
+      )}
+      <aside 
+        id="storefront-sidebar" 
       className={`fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-100 flex flex-col justify-between p-8 z-40 transition-transform duration-300 ${
         isOpenOnMobile ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}
@@ -67,7 +75,7 @@ export default function Sidebar({
           className="cursor-pointer mb-12 flex items-center justify-between gap-2"
         >
           <span className="font-sans font-bold text-2xl tracking-tighter text-[#1A1A1A] select-none">
-            SLATE.
+            Store
           </span>
           {onCloseMobile && (
             <button 
@@ -133,7 +141,7 @@ export default function Sidebar({
       <div id="sidebar-help-center" className="mt-auto">
         <button 
           id="btn-help-center"
-          onClick={() => alert("Centro de Ayuda: ¡El chat en vivo está activo! ¿Cómo podemos ayudarte hoy? Puedes escribirnos a support@slate.com")}
+          onClick={() => alert("Centro de Ayuda: ¡El chat en vivo está activo! ¿Cómo podemos ayudarte hoy? Puedes escribirnos a support@store.com")}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-[16px] text-[14px] font-semibold text-[#6C757D] hover:text-[#1A1A1A] hover:bg-gray-50 transition-all duration-200 cursor-pointer"
         >
           <HelpCircle className="w-4 h-4 text-gray-400" />
@@ -141,5 +149,6 @@ export default function Sidebar({
         </button>
       </div>
     </aside>
+    </>
   );
 }

@@ -1,5 +1,5 @@
 {
-  "name": "SLATE Minimalist Store",
+  "name": "Store",
   "description": "A modern and minimalist clothing e-commerce web application featuring high-quality design, dynamic Firestore-backed inventory catalogs, coupon validation, order checkouts, and a secure administration control panel.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

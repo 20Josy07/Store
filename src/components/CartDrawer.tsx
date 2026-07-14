@@ -1,3 +1,4 @@
+import { formatPrice } from "../lib/utils";
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -185,7 +186,7 @@ export default function CartDrawer({
                       </div>
 
                       <span className="text-xs font-extrabold text-[#1A1A1A]">
-                        ${(itemPrice * item.cantidad)}
+                        {formatPrice(itemPrice * item.cantidad)}
                       </span>
                     </div>
                   </div>
@@ -244,17 +245,17 @@ export default function CartDrawer({
             <div className="space-y-2 text-xs font-semibold text-[#6C757D] border-t border-gray-50 pt-3">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="text-[#1A1A1A]">${subtotal}</span>
+                <span className="text-[#1A1A1A]">{formatPrice(subtotal)}</span>
               </div>
               {appliedCoupon && (
                 <div className="flex justify-between text-emerald-600 font-bold">
                   <span>Descuento de Cupón ({appliedCoupon.id})</span>
-                  <span>-${discountAmount}</span>
+                  <span>-{formatPrice(discountAmount)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm font-black text-[#1A1A1A] border-t border-gray-100 pt-2.5">
                 <span>Total Estimado</span>
-                <span>${finalTotal}</span>
+                <span>{formatPrice(finalTotal)}</span>
               </div>
             </div>
 

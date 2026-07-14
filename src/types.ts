@@ -20,6 +20,9 @@ export interface Product {
   imagenes: string[];
   descripcion: string;
   variantes: ProductVariant[];
+  materiales?: string;
+  cuidado?: string;
+  envio?: string;
 }
 
 export interface CartItem {
@@ -72,6 +75,16 @@ export interface Coupon {
   valor: number;
   fecha_expiracion: string;
   categoria_restringida: string | null;
+}
+
+export interface Review {
+  id: string;
+  producto_id: string;
+  usuario_id: string;
+  usuario_nombre: string;
+  rating: number; // 1 to 5
+  comentario: string;
+  fecha_creacion: string;
 }
 
 export interface HomeBannerConfig {

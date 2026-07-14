@@ -1,3 +1,4 @@
+import { formatPrice } from "../lib/utils";
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -92,6 +93,9 @@ export default function AdminPanel({
     precio_descuento: null,
     imagenes: [''],
     descripcion: '',
+    materiales: '',
+    cuidado: '',
+    envio: '',
     variantes: []
   });
   const [newVariant, setNewVariant] = useState<ProductVariant>({ color: '', talla: '', stock: 0 });
@@ -219,6 +223,9 @@ export default function AdminPanel({
       precio_descuento: null,
       imagenes: [''],
       descripcion: '',
+      materiales: '',
+      cuidado: '',
+      envio: '',
       variantes: []
     });
     setNewVariant({ color: '', talla: '', stock: 0 });
@@ -655,17 +662,86 @@ export default function AdminPanel({
                       </div>
                     </div>
 
-                    <div>
-                      <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Descripción</label>
-                      <textarea
-                        value={productForm.descripcion}
-                        onChange={(e) => setProductForm({ ...productForm, descripcion: e.target.value })}
-                        rows={3}
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200/30 rounded-xl text-xs focus:ring-1 focus:ring-slate-300 text-slate-800 resize-none"
-                        placeholder="Describe los materiales, talla..."
-                        required
-                      />
-                    </div>
+                      <div>
+                        <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Descripción</label>
+                        <textarea
+                          value={productForm.descripcion}
+                          onChange={(e) => setProductForm({ ...productForm, descripcion: e.target.value })}
+                          rows={2}
+                          className="w-full px-4 py-3 bg-slate-50 border border-slate-200/30 rounded-xl text-xs focus:ring-1 focus:ring-slate-300 text-slate-800 resize-none"
+                          placeholder="Describe la pieza..."
+                          required
+                        />
+                      </div>
+
+                      <div className="pt-4 border-t border-slate-100 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Información Detallada</h3>
+                          <span className="text-[9px] text-slate-400 font-medium">Vacío = No se muestra</span>
+                        </div>
+
+                        <div className="space-y-4">
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <label className="text-[10px] uppercase font-bold text-slate-400">Materiales y Ética</label>
+                              <button 
+                                type="button"
+                                onClick={() => setProductForm({ ...productForm, materiales: "Tejido con fibras orgánicas 100% certificadas, utilizando procesos sostenibles y tintes a base de agua." })}
+                                className="text-[9px] font-bold text-red-500 hover:text-red-700 cursor-pointer"
+                              >
+                                Cargar Plantilla
+                              </button>
+                            </div>
+                            <textarea
+                              value={productForm.materiales || ''}
+                              onChange={(e) => setProductForm({ ...productForm, materiales: e.target.value })}
+                              rows={2}
+                              className="w-full px-4 py-3 bg-slate-50 border border-slate-200/30 rounded-xl text-xs focus:ring-1 focus:ring-slate-300 text-slate-800 resize-none"
+                              placeholder="Fibras orgánicas, procesos sostenibles..."
+                            />
+                          </div>
+
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <label className="text-[10px] uppercase font-bold text-slate-400">Instrucciones de Cuidado</label>
+                              <button 
+                                type="button"
+                                onClick={() => setProductForm({ ...productForm, cuidado: "Lavar a máquina en ciclos fríos y delicados. No usar blanqueador. Secar en secadora a baja temperatura." })}
+                                className="text-[9px] font-bold text-red-500 hover:text-red-700 cursor-pointer"
+                              >
+                                Cargar Plantilla
+                              </button>
+                            </div>
+                            <textarea
+                              value={productForm.cuidado || ''}
+                              onChange={(e) => setProductForm({ ...productForm, cuidado: e.target.value })}
+                              rows={2}
+                              className="w-full px-4 py-3 bg-slate-50 border border-slate-200/30 rounded-xl text-xs focus:ring-1 focus:ring-slate-300 text-slate-800 resize-none"
+                              placeholder="Lavar en frío, no usar blanqueador..."
+                            />
+                          </div>
+
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <label className="text-[10px] uppercase font-bold text-slate-400">Envío y Devoluciones</label>
+                              <button 
+                                type="button"
+                                onClick={() => setProductForm({ ...productForm, envio: "Disfruta de envío premium neutro en carbono. Despachos en 2-4 días hábiles. Devoluciones en 30 días." })}
+                                className="text-[9px] font-bold text-red-500 hover:text-red-700 cursor-pointer"
+                              >
+                                Cargar Plantilla
+                              </button>
+                            </div>
+                            <textarea
+                              value={productForm.envio || ''}
+                              onChange={(e) => setProductForm({ ...productForm, envio: e.target.value })}
+                              rows={2}
+                              className="w-full px-4 py-3 bg-slate-50 border border-slate-200/30 rounded-xl text-xs focus:ring-1 focus:ring-slate-300 text-slate-800 resize-none"
+                              placeholder="Tiempos de entrega, políticas..."
+                            />
+                          </div>
+                        </div>
+                      </div>
 
                     <div className="space-y-2 border-t border-slate-100 pt-3">
                       <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Imagen del Producto</label>
@@ -844,11 +920,11 @@ export default function AdminPanel({
                                 <td className="py-3.5 font-bold">
                                   {p.precio_descuento !== null ? (
                                     <div className="flex flex-col">
-                                      <span className="text-red-500">${p.precio_descuento}</span>
-                                      <span className="text-[10px] text-slate-400 line-through">${p.precio_regular}</span>
+                                      <span className="text-red-500">{formatPrice(p.precio_descuento)}</span>
+                                      <span className="text-[10px] text-slate-400 line-through">{formatPrice(p.precio_regular)}</span>
                                     </div>
                                   ) : (
-                                    <span>${p.precio_regular}</span>
+                                    <span>{formatPrice(p.precio_regular)}</span>
                                   )}
                                 </td>
                                 <td className="py-3.5">
@@ -956,7 +1032,7 @@ export default function AdminPanel({
                                 ))}
                               </div>
                             </td>
-                            <td className="py-4 font-black text-slate-900">${o.total.toFixed(2)}</td>
+                            <td className="py-4 font-black text-slate-900">{formatPrice(o.total)}</td>
                             <td className="py-4">
                               <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase inline-block border ${
                                 o.estado === 'pendiente' ? 'bg-amber-50 text-amber-600 border-amber-100' :

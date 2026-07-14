@@ -1,3 +1,4 @@
+import { formatPrice } from "../lib/utils";
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -22,7 +23,7 @@ export default function ProductCard({
   const hasDiscount = product.precio_descuento !== null && product.precio_descuento !== undefined;
   const totalStock = product.variantes ? product.variantes.reduce((acc, v) => acc + v.stock, 0) : 0;
   const isAgotado = totalStock === 0;
-
+  
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isAgotado) return;
@@ -102,9 +103,11 @@ export default function ProductCard({
       {/* Product Meta Info */}
       <div className="mt-4 flex-1 flex flex-col justify-between">
         <div>
-          <span className="text-[11px] text-[#6C757D] uppercase tracking-wider font-semibold">
-            {product.marca} • {translateCategory(product.categoria)}
-          </span>
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-[#6C757D] uppercase tracking-wider font-semibold">
+              {product.marca} • {translateCategory(product.categoria)}
+            </span>
+          </div>
           <h3 className="text-[14px] text-[#1A1A1A] font-medium mt-1 line-clamp-1 group-hover:text-gray-700 transition-colors">
             {product.nombre}
           </h3>
@@ -116,15 +119,15 @@ export default function ProductCard({
             {hasDiscount ? (
               <>
                 <span className="text-[16px] font-semibold text-[#1A1A1A]">
-                  ${product.precio_descuento}
+                  {formatPrice(product.precio_descuento)}
                 </span>
                 <span className="text-[14px] text-[#6C757D] line-through">
-                  ${product.precio_regular}
+                  {formatPrice(product.precio_regular)}
                 </span>
               </>
             ) : (
               <span className="text-[16px] font-semibold text-[#1A1A1A]">
-                ${product.precio_regular}
+                {formatPrice(product.precio_regular)}
               </span>
             )}
           </div>

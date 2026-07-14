@@ -108,7 +108,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalP
         {/* Modal Branding Header */}
         <div className="text-center space-y-2">
           <span className="font-sans font-black text-2xl tracking-tighter text-[#1A1A1A] select-none block">
-            SLATE.
+            Store
           </span>
           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-none">
             {isLogin ? 'Iniciar Sesión' : 'Registrarse'}

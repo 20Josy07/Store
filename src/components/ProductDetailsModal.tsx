@@ -1,20 +1,23 @@
+import { formatPrice } from "../lib/utils";
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
 
 import React, { useState, useEffect } from 'react';
-import { X, ChevronDown, ChevronUp, ShieldCheck, Truck, RefreshCw, ShoppingCart } from 'lucide-react';
-import { Product, ProductVariant } from '../types';
+import { X, ChevronDown, ChevronUp, ShieldCheck, Truck, RefreshCw, ShoppingCart, Star } from 'lucide-react';
+import { Product, ProductVariant, Review, UserProfile } from '../types';
 
 interface ProductDetailsModalProps {
   product: Product;
+  user: UserProfile | null;
   onClose: () => void;
   onAddToCart: (product: Product, quantity: number, color: string, size: string) => Promise<boolean> | any;
 }
 
 export default function ProductDetailsModal({
   product,
+  user,
   onClose,
   onAddToCart
 }: ProductDetailsModalProps) {
@@ -44,9 +47,9 @@ export default function ProductDetailsModal({
   const availableStock = currentVariant ? currentVariant.stock : 0;
 
   // Materials and care content templates (Spanish translations)
-  const materialsText = "Tejido con fibras orgánicas 100% certificadas GOTS, utilizando métodos locales de irrigación por lluvia y teñido con tintes orgánicos a base de agua. Su tejido de alta densidad ofrece una estructura duradera libre de sintéticos que puedan irritar la piel.";
-  const careText = "Lavar a máquina en ciclos fríos y delicados con detergente líquido libre de fosfatos. No usar blanqueador. Secar en secadora a baja temperatura o colgar a la sombra para mantener la elasticidad de las fibras.";
-  const shippingText = "Disfruta de envío a domicilio premium neutro en carbono para compras superiores a $100. Los despachos tardan entre 2 y 4 días hábiles. Se aceptan devoluciones dentro de los 30 días posteriores a la entrega.";
+  const materialsText = product.materiales !== undefined ? product.materiales : (['Clothing', 'ActiveWear'].includes(product.categoria) ? "Tejido con fibras orgánicas 100% certificadas GOTS, utilizando métodos locales de irrigación por lluvia y teñido con tintes orgánicos a base de agua. Su tejido de alta densidad ofrece una estructura duradera libre de sintéticos que puedan irritar la piel." : null);
+  const careText = product.cuidado !== undefined ? product.cuidado : (['Clothing', 'ActiveWear'].includes(product.categoria) ? "Lavar a máquina en ciclos fríos y delicados con detergente líquido libre de fosfatos. No usar blanqueador. Secar en secadora a baja temperatura o colgar a la sombra para mantener la elasticidad de las fibras." : null);
+  const shippingText = product.envio !== undefined ? product.envio : "Disfruta de envío a domicilio premium neutro en carbono para compras. Los despachos tardan entre 2 y 4 días hábiles. Se aceptan devoluciones dentro de los 30 días posteriores a la entrega.";
 
   const handleAdd = async () => {
     if (availableStock <= 0) {
@@ -121,27 +124,31 @@ export default function ProductDetailsModal({
         <div id="details-customizer" className="w-full md:w-1/2 flex flex-col justify-between pt-4">
           <div>
             {/* Header / Brand info */}
-            <span className="text-xs font-black text-gray-400 tracking-wider uppercase">
-              {product.marca}
-            </span>
-            <h1 className="text-2xl font-black text-gray-950 mt-1 tracking-tight leading-none">
-              {product.nombre}
-            </h1>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <span className="text-xs font-black text-gray-400 tracking-wider uppercase">
+                  {product.marca}
+                </span>
+                <h1 className="text-2xl font-black text-gray-950 mt-1 tracking-tight leading-none">
+                  {product.nombre}
+                </h1>
+              </div>
+            </div>
 
             {/* Price section */}
             <div className="flex items-center gap-3 mt-3">
               {product.precio_descuento !== null ? (
                 <>
                   <span className="text-xl font-black text-[#E63946]">
-                    ${product.precio_descuento}
+                    {formatPrice(product.precio_descuento)}
                   </span>
                   <span className="text-sm text-gray-400 line-through">
-                    ${product.precio_regular}
+                    {formatPrice(product.precio_regular)}
                   </span>
                 </>
               ) : (
                 <span className="text-xl font-bold text-gray-950">
-                  ${product.precio_regular}
+                  {formatPrice(product.precio_regular)}
                 </span>
               )}
             </div>
@@ -272,58 +279,64 @@ export default function ProductDetailsModal({
             {/* Accordions */}
             <div id="details-accordions" className="mt-6 space-y-2 border-t border-gray-100 pt-4">
               {/* Materials */}
-              <div className="border-b border-gray-50 pb-2">
-                <button
-                  onClick={() => toggleAccordion('materials')}
-                  className="w-full flex items-center justify-between text-left py-2.5 text-xs font-bold text-gray-800 hover:text-gray-900"
-                >
-                  <span className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-gray-400" /> Materiales y Ética
-                  </span>
-                  {activeAccordion === 'materials' ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                </button>
-                {activeAccordion === 'materials' && (
-                  <p className="text-[11px] text-gray-500 leading-relaxed px-1 pt-1 pb-2">
-                    {materialsText}
-                  </p>
-                )}
-              </div>
+              {materialsText && (
+                <div className="border-b border-gray-50 pb-2">
+                  <button
+                    onClick={() => toggleAccordion('materials')}
+                    className="w-full flex items-center justify-between text-left py-2.5 text-xs font-bold text-gray-800 hover:text-gray-900"
+                  >
+                    <span className="flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-gray-400" /> Materiales y Ética
+                    </span>
+                    {activeAccordion === 'materials' ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                  </button>
+                  {activeAccordion === 'materials' && (
+                    <p className="text-[11px] text-gray-500 leading-relaxed px-1 pt-1 pb-2">
+                      {materialsText}
+                    </p>
+                  )}
+                </div>
+              )}
 
               {/* Care Instructions */}
-              <div className="border-b border-gray-50 pb-2">
-                <button
-                  onClick={() => toggleAccordion('care')}
-                  className="w-full flex items-center justify-between text-left py-2.5 text-xs font-bold text-gray-800 hover:text-gray-900"
-                >
-                  <span className="flex items-center gap-2">
-                    <RefreshCw className="w-4 h-4 text-gray-400" /> Instrucciones de Cuidado
-                  </span>
-                  {activeAccordion === 'care' ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                </button>
-                {activeAccordion === 'care' && (
-                  <p className="text-[11px] text-gray-500 leading-relaxed px-1 pt-1 pb-2">
-                    {careText}
-                  </p>
-                )}
-              </div>
+              {careText && (
+                <div className="border-b border-gray-50 pb-2">
+                  <button
+                    onClick={() => toggleAccordion('care')}
+                    className="w-full flex items-center justify-between text-left py-2.5 text-xs font-bold text-gray-800 hover:text-gray-900"
+                  >
+                    <span className="flex items-center gap-2">
+                      <RefreshCw className="w-4 h-4 text-gray-400" /> Instrucciones de Cuidado
+                    </span>
+                    {activeAccordion === 'care' ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                  </button>
+                  {activeAccordion === 'care' && (
+                    <p className="text-[11px] text-gray-500 leading-relaxed px-1 pt-1 pb-2">
+                      {careText}
+                    </p>
+                  )}
+                </div>
+              )}
 
               {/* Shipping & Returns */}
-              <div className="pb-1">
-                <button
-                  onClick={() => toggleAccordion('shipping')}
-                  className="w-full flex items-center justify-between text-left py-2.5 text-xs font-bold text-gray-800 hover:text-gray-900"
-                >
-                  <span className="flex items-center gap-2">
-                    <Truck className="w-4 h-4 text-gray-400" /> Envío y Devoluciones Gratis
-                  </span>
-                  {activeAccordion === 'shipping' ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                </button>
-                {activeAccordion === 'shipping' && (
-                  <p className="text-[11px] text-gray-500 leading-relaxed px-1 pt-1 pb-2">
-                    {shippingText}
-                  </p>
-                )}
-              </div>
+              {shippingText && (
+                <div className="border-b border-gray-50 pb-2">
+                  <button
+                    onClick={() => toggleAccordion('shipping')}
+                    className="w-full flex items-center justify-between text-left py-2.5 text-xs font-bold text-gray-800 hover:text-gray-900"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Truck className="w-4 h-4 text-gray-400" /> Envío y Devoluciones
+                    </span>
+                    {activeAccordion === 'shipping' ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                  </button>
+                  {activeAccordion === 'shipping' && (
+                    <p className="text-[11px] text-gray-500 leading-relaxed px-1 pt-1 pb-2">
+                      {shippingText}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

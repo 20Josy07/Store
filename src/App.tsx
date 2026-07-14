@@ -1,3 +1,4 @@
+import { formatPrice } from "./lib/utils";
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -14,7 +15,8 @@ import {
   doc,
   onSnapshot,
   query,
-  where
+  where,
+  addDoc
 } from './firebase';
 import { 
   getProductsFromDB, 
@@ -32,7 +34,7 @@ import {
   reserveStockInDB,
   releaseStockInDB
 } from './data/dbHelpers';
-import { Product, Coupon, Order, CartItem, UserProfile, HomeBannerConfig } from './types';
+import { Product, Coupon, Order, CartItem, UserProfile, HomeBannerConfig, Review } from './types';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import ProductCard from './components/ProductCard';
@@ -54,6 +56,7 @@ export default function App() {
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [homeConfig, setHomeConfig] = useState<HomeBannerConfig>({
     id: 'home_cms',
     banner1_texto: 'GET UP TO 50% For the holiday season',
@@ -72,6 +75,7 @@ export default function App() {
   const [activeProductDetail, setActiveProductDetail] = useState<Product | null>(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // --- 1. BOOTSTRAP AUTH & REAL-TIME FIRESTORE SUBSCRIPTIONS ---
   useEffect(() => {
@@ -120,6 +124,17 @@ export default function App() {
       console.warn("CMS config sync warning:", error);
     });
 
+    // F2. Real-time Reviews Sync
+    const unsubscribeReviews = onSnapshot(collection(db, 'reviews'), (snapshot) => {
+      const items: Review[] = [];
+      snapshot.forEach(doc => {
+        items.push({ id: doc.id, ...doc.data() } as Review);
+      });
+      setReviews(items);
+    }, (error) => {
+      console.warn("Reviews sync warning:", error);
+    });
+
     // G. Pull local cart state
     const savedCart = localStorage.getItem('slate_cart');
     if (savedCart) {
@@ -135,6 +150,7 @@ export default function App() {
       unsubscribeProducts();
       unsubscribeCoupons();
       unsubscribeCMS();
+      unsubscribeReviews();
     };
   }, []);
 
@@ -312,6 +328,26 @@ export default function App() {
     await createOrderInDB(order);
   };
 
+  // --- REVIEWS ---
+  const handleAddReview = async (productId: string, rating: number, comentario: string) => {
+    if (!user) return false;
+    try {
+      const reviewData: Omit<Review, 'id'> = {
+        producto_id: productId,
+        usuario_id: user.uid,
+        usuario_nombre: user.nombre || user.email || 'Usuario',
+        rating,
+        comentario,
+        fecha_creacion: new Date().toISOString()
+      };
+      await addDoc(collection(db, 'reviews'), reviewData);
+      return true;
+    } catch (error) {
+      console.error("Error adding review:", error);
+      return false;
+    }
+  };
+
   // --- METRICS & FILTERED PRODUCTS ---
   const filteredProducts = products.filter(p => {
     const matchesGender = p.genero === currentGender;
@@ -356,6 +392,8 @@ export default function App() {
           isAdminUser={!!user?.esAdmin}
           currentPage={currentPage}
           onNavigate={setCurrentPage}
+          isOpenOnMobile={isMobileSidebarOpen}
+          onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
       )}
 
@@ -371,6 +409,7 @@ export default function App() {
           user={user}
           onSignIn={handleSignIn}
           onSignOut={handleSignOut}
+          onToggleSidebar={() => setIsMobileSidebarOpen(true)}
         />
       )}
 
@@ -473,11 +512,11 @@ export default function App() {
                           <div className="flex items-baseline gap-2">
                             {p.precio_descuento !== null ? (
                               <>
-                                <span className="text-[16px] font-bold text-[#1A1A1A]">${p.precio_descuento}</span>
-                                <span className="text-[14px] text-[#6C757D] line-through">${p.precio_regular}</span>
+                                <span className="text-[16px] font-bold text-[#1A1A1A]">{formatPrice(p.precio_descuento)}</span>
+                                <span className="text-[14px] text-[#6C757D] line-through">{formatPrice(p.precio_regular)}</span>
                               </>
                             ) : (
-                              <span className="text-[16px] font-bold text-[#1A1A1A]">${p.precio_regular}</span>
+                              <span className="text-[16px] font-bold text-[#1A1A1A]">{formatPrice(p.precio_regular)}</span>
                             )}
                           </div>
                           <span className="text-[12px] font-bold text-[#1A1A1A] hover:text-[#E63946] underline underline-offset-4 flex items-center gap-1">
@@ -514,6 +553,7 @@ export default function App() {
                     <ProductCard
                       key={p.id}
                       product={p}
+                      reviews={reviews.filter(r => r.producto_id === p.id)}
                       onProductClick={setActiveProductDetail}
                       onAddToCart={(product) => handleAddToCart(product, 1)}
                     />
@@ -577,6 +617,7 @@ export default function App() {
       {activeProductDetail && (
         <ProductDetailsModal
           product={activeProductDetail}
+          user={user}
           onClose={() => setActiveProductDetail(null)}
           onAddToCart={handleAddToCart}
         />
