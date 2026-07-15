@@ -21,43 +21,14 @@ import {
   runTransaction
 } from '../firebase';
 import { Product, Coupon, Order, HomeBannerConfig } from '../types';
-import { INITIAL_PRODUCTS, INITIAL_COUPONS, DEFAULT_HOME_CONFIG } from './seedData';
 
-// Seeding function to populate Firestore automatically if empty
-export async function seedDatabaseIfEmpty(): Promise<void> {
-  try {
-    // 1. Seed Home configuration
-    const configDocRef = doc(db, 'config', 'home_cms');
-    const configSnap = await getDoc(configDocRef);
-    if (!configSnap.exists()) {
-      await setDoc(configDocRef, DEFAULT_HOME_CONFIG);
-      console.log("Seeded Home Banner Config.");
-    }
-
-    // 2. Seed Products
-    const productsColRef = collection(db, 'productos');
-    const productsSnap = await getDocs(productsColRef);
-    if (productsSnap.empty) {
-      for (const p of INITIAL_PRODUCTS) {
-        await setDoc(doc(db, 'productos', p.id), p);
-      }
-      console.log(`Seeded ${INITIAL_PRODUCTS.length} Products.`);
-    }
-
-    // 3. Seed Coupons
-    const couponsColRef = collection(db, 'cupones');
-    const couponsSnap = await getDocs(couponsColRef);
-    if (couponsSnap.empty) {
-      for (const c of INITIAL_COUPONS) {
-        await setDoc(doc(db, 'cupones', c.id), c);
-      }
-      console.log(`Seeded ${INITIAL_COUPONS.length} Coupons.`);
-    }
-  } catch (error) {
-    console.warn("Auto-seeding warning (could be rules restriction):", error);
-    // Non-blocking catch to ensure app boots up even if Firestore write rules block anonymous seeding
-  }
-}
+const FALLBACK_HOME_CONFIG: HomeBannerConfig = {
+  id: 'home_cms',
+  banner1_texto: 'GET UP TO 50% For the holiday season',
+  banner1_bg: '#F4EBE1',
+  banner2_texto: 'GET UP TO 30% OFF SHIRTS ⚡',
+  banner2_bg: '#AEE5E5'
+};
 
 // --- PRODUCTS API ---
 export async function getProductsFromDB(): Promise<Product[]> {
@@ -143,7 +114,7 @@ export async function getHomeConfigFromDB(): Promise<HomeBannerConfig> {
     if (configDoc.exists()) {
       return configDoc.data() as HomeBannerConfig;
     }
-    return DEFAULT_HOME_CONFIG;
+    return FALLBACK_HOME_CONFIG;
   } catch (error) {
     handleFirestoreError(error, OperationType.GET, path);
   }
