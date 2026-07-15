@@ -12,9 +12,9 @@ export interface ProductVariant {
 export interface Product {
   id: string;
   nombre: string;
-  marca: string;
+  marca?: string;
   categoria: string; // 'Clothing' | 'Shoes' | 'Accessories' | 'ActiveWear' | 'Outlet'
-  genero: 'Women' | 'Men';
+  genero: 'Women' | 'Men' | 'Unisex';
   precio_regular: number;
   precio_descuento: number | null;
   imagenes: string[];

@@ -102,6 +102,7 @@ export default function AdminPanel({
     variantes: []
   });
   const [newVariant, setNewVariant] = useState<ProductVariant>({ color: '', talla: '', stock: 0 });
+  const [editingVariantIndex, setEditingVariantIndex] = useState<number | null>(null);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -186,8 +187,8 @@ export default function AdminPanel({
   // --- PRODUCT CRUD HANDLERS ---
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!productForm.id || !productForm.nombre || !productForm.marca) {
-      showToast("Por favor, completa el SKU, Nombre y Marca.", "error");
+    if (!productForm.id || !productForm.nombre) {
+      showToast("Por favor, completa el SKU y el Nombre.", "error");
       return;
     }
 
@@ -232,6 +233,7 @@ export default function AdminPanel({
       variantes: []
     });
     setNewVariant({ color: '', talla: '', stock: 0 });
+    setEditingVariantIndex(null);
     setIsEditingProduct(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
@@ -261,10 +263,12 @@ export default function AdminPanel({
       return;
     }
     
-    // Check if variant combination already exists
+    // Check if variant combination already exists (excluding the one being edited)
     const exists = productForm.variantes.some(
-      v => v.color.toLowerCase() === newVariant.color.toLowerCase() && 
-           v.talla.toLowerCase() === newVariant.talla.toLowerCase()
+      (v, idx) => 
+        idx !== editingVariantIndex &&
+        v.color.toLowerCase() === newVariant.color.toLowerCase() && 
+        v.talla.toLowerCase() === newVariant.talla.toLowerCase()
     );
 
     if (exists) {
@@ -272,12 +276,25 @@ export default function AdminPanel({
       return;
     }
 
-    setProductForm({
-      ...productForm,
-      variantes: [...productForm.variantes, { ...newVariant }]
-    });
+    if (editingVariantIndex !== null) {
+      const updatedVariantes = [...productForm.variantes];
+      updatedVariantes[editingVariantIndex] = { ...newVariant };
+      setProductForm({ ...productForm, variantes: updatedVariantes });
+      setEditingVariantIndex(null);
+      showToast("Variante actualizada correctamente.");
+    } else {
+      setProductForm({
+        ...productForm,
+        variantes: [...productForm.variantes, { ...newVariant }]
+      });
+      showToast("Variante añadida correctamente.");
+    }
     setNewVariant({ color: '', talla: '', stock: 0 });
-    showToast("Variante añadida correctamente.");
+  };
+
+  const handleEditVariant = (idx: number) => {
+    setNewVariant({ ...productForm.variantes[idx] });
+    setEditingVariantIndex(idx);
   };
 
   const handleRemoveVariant = (idx: number) => {
@@ -602,11 +619,10 @@ export default function AdminPanel({
                         <label className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Marca</label>
                         <input
                           type="text"
-                          value={productForm.marca}
+                          value={productForm.marca || ''}
                           onChange={(e) => setProductForm({ ...productForm, marca: e.target.value })}
                           className="w-full px-4 py-3 bg-slate-50 border border-slate-200/30 rounded-xl text-xs focus:ring-1 focus:ring-slate-300 text-slate-800"
                           placeholder="SLATE. Original"
-                          required
                         />
                       </div>
                     </div>
@@ -633,6 +649,7 @@ export default function AdminPanel({
                         >
                           <option value="Women">Mujer</option>
                           <option value="Men">Hombre</option>
+                          <option value="Unisex">Unisex</option>
                         </select>
                       </div>
                     </div>
@@ -798,7 +815,7 @@ export default function AdminPanel({
                           type="text"
                           value={newVariant.color}
                           onChange={(e) => setNewVariant({ ...newVariant, color: e.target.value })}
-                          placeholder="Color"
+                          placeholder="#000000"
                           className="px-3 py-2 bg-slate-50 border border-slate-200/30 rounded-lg text-[10px] focus:ring-1 focus:ring-slate-300 text-slate-800"
                         />
                         <input
@@ -822,7 +839,7 @@ export default function AdminPanel({
                         onClick={handleAddVariant}
                         className="w-full py-2 border border-dashed border-slate-200 hover:border-slate-900 text-slate-600 hover:text-slate-900 rounded-lg text-[10px] font-bold transition-all duration-300 cursor-pointer"
                       >
-                        + Añadir Variante
+                        {editingVariantIndex !== null ? 'Guardar Cambios' : '+ Añadir Variante'}
                       </button>
 
                       {/* Lista de variantes agregadas */}
@@ -831,16 +848,25 @@ export default function AdminPanel({
                           {productForm.variantes.map((v, index) => (
                             <div key={index} className="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-xl text-[10px] font-semibold text-slate-600 border border-slate-100">
                               <div className="flex items-center gap-2 truncate">
-                                <span className={`w-3 h-3 rounded-full ${getColorStyle(v.color)} border border-slate-200`} />
+                                <span className={`w-3 h-3 rounded-full ${v.color.startsWith('#') ? '' : getColorStyle(v.color)} border border-slate-200`} style={v.color.startsWith('#') ? { backgroundColor: v.color } : undefined} />
                                 <span className="truncate">{v.color} - Talla {v.talla} ({v.stock} uds)</span>
                               </div>
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveVariant(index)}
-                                className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded-lg transition-colors cursor-pointer"
-                              >
-                                Eliminar
-                              </button>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => handleEditVariant(index)}
+                                  className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1 rounded-lg transition-colors cursor-pointer"
+                                >
+                                  Editar
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveVariant(index)}
+                                  className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1 rounded-lg transition-colors cursor-pointer"
+                                >
+                                  Eliminar
+                                </button>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -937,7 +963,7 @@ export default function AdminPanel({
                                       <span className="text-[10px] text-slate-400 font-semibold block uppercase">SKU: {p.id} | {p.marca}</span>
                                       <div className="flex gap-1 ml-1">
                                         {Array.from(new Set(p.variantes.map(v => v.color))).map((c, i) => (
-                                          <span key={i} className={`w-2 h-2 rounded-full ${getColorStyle(c)} border border-slate-200`} title={c} />
+                                          <span key={i} className={`w-2 h-2 rounded-full ${c.startsWith('#') ? '' : getColorStyle(c)} border border-slate-200`} style={c.startsWith('#') ? { backgroundColor: c } : undefined} title={c} />
                                         ))}
                                       </div>
                                     </div>
@@ -1363,7 +1389,7 @@ export default function AdminPanel({
                               <div>
                                 <p className="font-bold text-slate-900">{it.nombre}</p>
                                 <div className="flex items-center gap-2 mt-1">
-                                  <span className={`w-2 h-2 rounded-full ${getColorStyle(it.color)} border border-slate-200`} />
+                                  <span className={`w-2 h-2 rounded-full ${it.color.startsWith('#') ? '' : getColorStyle(it.color)} border border-slate-200`} style={it.color.startsWith('#') ? { backgroundColor: it.color } : undefined} />
                                   <span className="text-[10px] text-slate-500 font-semibold">{it.color} / Talla {it.talla}</span>
                                 </div>
                               </div>
