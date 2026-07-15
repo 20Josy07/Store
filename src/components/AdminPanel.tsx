@@ -101,7 +101,7 @@ export default function AdminPanel({
     envio: '',
     variantes: []
   });
-  const [newVariant, setNewVariant] = useState<ProductVariant>({ color: '', talla: '', stock: 0 });
+  const [newVariant, setNewVariant] = useState<ProductVariant>({ colores: [{ hex: '', nombre: '' }], talla: '', stock: 0 });
   const [editingVariantIndex, setEditingVariantIndex] = useState<number | null>(null);
 
   // Close dropdown on click outside
@@ -232,7 +232,7 @@ export default function AdminPanel({
       envio: '',
       variantes: []
     });
-    setNewVariant({ color: '', talla: '', stock: 0 });
+    setNewVariant({ colores: [{ hex: '', nombre: '' }], talla: '', stock: 0 });
     setEditingVariantIndex(null);
     setIsEditingProduct(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -258,21 +258,23 @@ export default function AdminPanel({
   };
 
   const handleAddVariant = () => {
-    if (!newVariant.color || !newVariant.talla || newVariant.stock < 0) {
-      showToast("Completa Color, Talla y Stock para la variante.", "error");
+    const hasInvalidColor = newVariant.colores.some(c => !c.hex || !c.nombre);
+    if (hasInvalidColor || !newVariant.talla || newVariant.stock < 0) {
+      showToast("Completa los Colores (Hex y Nombre), Talla y Stock para la variante.", "error");
       return;
     }
     
     // Check if variant combination already exists (excluding the one being edited)
+    // For "exists" check, we'll compare talla and the stringified colors
     const exists = productForm.variantes.some(
       (v, idx) => 
         idx !== editingVariantIndex &&
-        v.color.toLowerCase() === newVariant.color.toLowerCase() && 
+        JSON.stringify(v.colores) === JSON.stringify(newVariant.colores) && 
         v.talla.toLowerCase() === newVariant.talla.toLowerCase()
     );
 
     if (exists) {
-      showToast("Esta combinación de Color y Talla ya ha sido agregada.", "error");
+      showToast("Esta combinación de Colores y Talla ya ha sido agregada.", "error");
       return;
     }
 
@@ -289,7 +291,7 @@ export default function AdminPanel({
       });
       showToast("Variante añadida correctamente.");
     }
-    setNewVariant({ color: '', talla: '', stock: 0 });
+    setNewVariant({ colores: [{ hex: '', nombre: '' }], talla: '', stock: 0 });
   };
 
   const handleEditVariant = (idx: number) => {
@@ -807,32 +809,83 @@ export default function AdminPanel({
                     </div>
 
                     {/* Builder de Variantes (Define Stock) */}
-                    <div className="border-t border-slate-100 pt-3 space-y-2">
+                    <div className="border-t border-slate-100 pt-3 space-y-4">
                       <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Variantes de Stock</span>
                       
-                      <div className="grid grid-cols-3 gap-2">
-                        <input
-                          type="text"
-                          value={newVariant.color}
-                          onChange={(e) => setNewVariant({ ...newVariant, color: e.target.value })}
-                          placeholder="#000000"
-                          className="px-3 py-2 bg-slate-50 border border-slate-200/30 rounded-lg text-[10px] focus:ring-1 focus:ring-slate-300 text-slate-800"
-                        />
-                        <input
-                          type="text"
-                          value={newVariant.talla}
-                          onChange={(e) => setNewVariant({ ...newVariant, talla: e.target.value })}
-                          placeholder="Talla"
-                          className="px-3 py-2 bg-slate-50 border border-slate-200/30 rounded-lg text-[10px] focus:ring-1 focus:ring-slate-300 text-slate-800"
-                        />
-                        <input
-                          type="number"
-                          value={newVariant.stock || ''}
-                          onChange={(e) => setNewVariant({ ...newVariant, stock: Math.max(0, parseInt(e.target.value) || 0) })}
-                          placeholder="Stock"
-                          className="px-3 py-2 bg-slate-50 border border-slate-200/30 rounded-lg text-[10px] focus:ring-1 focus:ring-slate-300 text-slate-800"
-                          min="0"
-                        />
+                      {/* Colores de la variante */}
+                      <div className="space-y-2 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                        <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Colores de esta variante</label>
+                        {newVariant.colores.map((c, idx) => (
+                          <div key={idx} className="flex gap-2 items-center">
+                            <input
+                              type="text"
+                              value={c.hex}
+                              onChange={(e) => {
+                                const updated = [...newVariant.colores];
+                                updated[idx].hex = e.target.value;
+                                setNewVariant({ ...newVariant, colores: updated });
+                              }}
+                              placeholder="#Hex"
+                              className="w-20 px-3 py-2 bg-white border border-slate-200 rounded-lg text-[10px] focus:ring-1 focus:ring-slate-300 text-slate-800"
+                            />
+                            <input
+                              type="text"
+                              value={c.nombre}
+                              onChange={(e) => {
+                                const updated = [...newVariant.colores];
+                                updated[idx].nombre = e.target.value;
+                                setNewVariant({ ...newVariant, colores: updated });
+                              }}
+                              placeholder="Nombre del color (ej. Azul Marino)"
+                              className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-[10px] focus:ring-1 focus:ring-slate-300 text-slate-800"
+                            />
+                            {newVariant.colores.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setNewVariant({
+                                    ...newVariant,
+                                    colores: newVariant.colores.filter((_, i) => i !== idx)
+                                  });
+                                }}
+                                className="text-red-400 hover:text-red-600 p-1"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => setNewVariant({ ...newVariant, colores: [...newVariant.colores, { hex: '', nombre: '' }] })}
+                          className="text-[9px] text-blue-600 font-bold hover:underline flex items-center gap-1"
+                        >
+                          + Añadir otro color a esta variante
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-[9px] uppercase font-bold text-slate-400 block mb-1">Talla</label>
+                          <input
+                            type="text"
+                            value={newVariant.talla}
+                            onChange={(e) => setNewVariant({ ...newVariant, talla: e.target.value })}
+                            placeholder="Talla (ej. XL, 42)"
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[10px] focus:ring-1 focus:ring-slate-300 text-slate-800"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[9px] uppercase font-bold text-slate-400 block mb-1">Stock</label>
+                          <input
+                            type="number"
+                            value={newVariant.stock || ''}
+                            onChange={(e) => setNewVariant({ ...newVariant, stock: Math.max(0, parseInt(e.target.value) || 0) })}
+                            placeholder="Cantidad"
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[10px] focus:ring-1 focus:ring-slate-300 text-slate-800"
+                            min="0"
+                          />
+                        </div>
                       </div>
                       <button
                         type="button"
@@ -848,8 +901,19 @@ export default function AdminPanel({
                           {productForm.variantes.map((v, index) => (
                             <div key={index} className="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-xl text-[10px] font-semibold text-slate-600 border border-slate-100">
                               <div className="flex items-center gap-2 truncate">
-                                <span className={`w-3 h-3 rounded-full ${v.color.startsWith('#') ? '' : getColorStyle(v.color)} border border-slate-200`} style={v.color.startsWith('#') ? { backgroundColor: v.color } : undefined} />
-                                <span className="truncate">{v.color} - Talla {v.talla} ({v.stock} uds)</span>
+                                <div className="flex -space-x-1">
+                                  {v.colores.map((c, i) => (
+                                    <span 
+                                      key={i} 
+                                      className="w-3 h-3 rounded-full border border-white" 
+                                      style={{ backgroundColor: c.hex }} 
+                                      title={c.nombre} 
+                                    />
+                                  ))}
+                                </div>
+                                <span className="truncate">
+                                  {v.colores.map(c => c.nombre).join(' / ')} - Talla {v.talla} ({v.stock} uds)
+                                </span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <button
@@ -962,8 +1026,13 @@ export default function AdminPanel({
                                     <div className="flex items-center gap-1.5 mt-0.5">
                                       <span className="text-[10px] text-slate-400 font-semibold block uppercase">SKU: {p.id} | {p.marca}</span>
                                       <div className="flex gap-1 ml-1">
-                                        {Array.from(new Set(p.variantes.map(v => v.color))).map((c, i) => (
-                                          <span key={i} className={`w-2 h-2 rounded-full ${c.startsWith('#') ? '' : getColorStyle(c)} border border-slate-200`} style={c.startsWith('#') ? { backgroundColor: c } : undefined} title={c} />
+                                        {Array.from(new Set(p.variantes.flatMap(v => v.colores))).filter((v, i, a) => a.findIndex(t => t.hex === v.hex) === i).map((c, i) => (
+                                          <span 
+                                            key={i} 
+                                            className="w-2 h-2 rounded-full border border-slate-200" 
+                                            style={{ backgroundColor: c.hex }} 
+                                            title={c.nombre} 
+                                          />
                                         ))}
                                       </div>
                                     </div>
@@ -989,7 +1058,7 @@ export default function AdminPanel({
                                       {totalStock === 0 ? 'Agotado' : `${totalStock} uds`}
                                     </span>
                                     <span className="text-[9px] text-slate-400 max-w-[150px] truncate block leading-none">
-                                      {p.variantes.map(v => `${v.color}(${v.talla}):${v.stock}`).join(', ')}
+                                      {p.variantes.map(v => `${v.colores.map(c => c.nombre).join('/')}(${v.talla}):${v.stock}`).join(', ')}
                                     </span>
                                   </div>
                                 </td>
@@ -1389,8 +1458,16 @@ export default function AdminPanel({
                               <div>
                                 <p className="font-bold text-slate-900">{it.nombre}</p>
                                 <div className="flex items-center gap-2 mt-1">
-                                  <span className={`w-2 h-2 rounded-full ${it.color.startsWith('#') ? '' : getColorStyle(it.color)} border border-slate-200`} style={it.color.startsWith('#') ? { backgroundColor: it.color } : undefined} />
-                                  <span className="text-[10px] text-slate-500 font-semibold">{it.color} / Talla {it.talla}</span>
+                                  <div className="flex -space-x-1">
+                                    {it.color.split(' / ').map((name, i) => {
+                                      // We might need a lookup for the hex, but OrderItem only stores the name string for now
+                                      // Actually, it's better to store hex in OrderItem too, but let's just show names for now if hex is missing
+                                      return (
+                                        <span key={i} className="px-1 bg-slate-200 rounded text-[8px] uppercase">{name}</span>
+                                      );
+                                    })}
+                                  </div>
+                                  <span className="text-[10px] text-slate-500 font-semibold">Talla {it.talla}</span>
                                 </div>
                               </div>
                             </div>

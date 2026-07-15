@@ -21,10 +21,10 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "High-performance ribbed fabric set. Features a medium support sports bra and high-waist compressive leggings designed for absolute comfort and breathability.",
     variantes: [
-      { color: "Slate Grey", talla: "S", stock: 15 },
-      { color: "Slate Grey", talla: "M", stock: 20 },
-      { color: "Sage Green", talla: "M", stock: 10 },
-      { color: "Sage Green", talla: "L", stock: 8 }
+      { colores: [{ hex: "#708090", nombre: "Slate Grey" }], talla: "S", stock: 15 },
+      { colores: [{ hex: "#708090", nombre: "Slate Grey" }], talla: "M", stock: 20 },
+      { colores: [{ hex: "#9DC183", nombre: "Sage Green" }], talla: "M", stock: 10 },
+      { colores: [{ hex: "#9DC183", nombre: "Sage Green" }], talla: "L", stock: 8 }
     ]
   },
   {
@@ -40,9 +40,9 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "Engineered with sweat-wicking materials and four-way stretch fabric. Side pockets integrated for key essentials during your high-intensity cardio sessions.",
     variantes: [
-      { color: "Matte Black", talla: "XS", stock: 5 },
-      { color: "Matte Black", talla: "S", stock: 25 },
-      { color: "Matte Black", talla: "M", stock: 30 }
+      { colores: [{ hex: "#28282B", nombre: "Matte Black" }], talla: "XS", stock: 5 },
+      { colores: [{ hex: "#28282B", nombre: "Matte Black" }], talla: "S", stock: 25 },
+      { colores: [{ hex: "#28282B", nombre: "Matte Black" }], talla: "M", stock: 30 }
     ]
   },
   {
@@ -58,9 +58,9 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "Ultra-lightweight crop top with breathable mesh panels. Ideal for layering over bras or wearing standalone during yoga sessions.",
     variantes: [
-      { color: "Off-White", talla: "S", stock: 12 },
-      { color: "Off-White", talla: "M", stock: 18 },
-      { color: "Dusty Rose", talla: "S", stock: 10 }
+      { colores: [{ hex: "#FAF9F6", nombre: "Off-White" }], talla: "S", stock: 12 },
+      { colores: [{ hex: "#FAF9F6", nombre: "Off-White" }], talla: "M", stock: 18 },
+      { colores: [{ hex: "#C08081", nombre: "Dusty Rose" }], talla: "S", stock: 10 }
     ]
   },
   {
@@ -76,9 +76,9 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "Slim fit running jacket with secure-zip pockets and thumbholes. Wind-resistant front panel keeps you warm during morning runs.",
     variantes: [
-      { color: "Midnight Navy", talla: "S", stock: 8 },
-      { color: "Midnight Navy", talla: "M", stock: 12 },
-      { color: "Off-White", talla: "M", stock: 6 }
+      { colores: [{ hex: "#000080", nombre: "Midnight Navy" }], talla: "S", stock: 8 },
+      { colores: [{ hex: "#000080", nombre: "Midnight Navy" }], talla: "M", stock: 12 },
+      { colores: [{ hex: "#FAF9F6", nombre: "Off-White" }], talla: "M", stock: 6 }
     ]
   },
 
@@ -96,9 +96,9 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "Lightweight and stretchy training shorts designed for maximum mobility. Features an internal drawcord and quick-access back zipper pocket.",
     variantes: [
-      { color: "Obsidian", talla: "M", stock: 22 },
-      { color: "Obsidian", talla: "L", stock: 15 },
-      { color: "Heather Grey", talla: "L", stock: 14 }
+      { colores: [{ hex: "#0B0B0B", nombre: "Obsidian" }], talla: "M", stock: 22 },
+      { colores: [{ hex: "#0B0B0B", nombre: "Obsidian" }], talla: "L", stock: 15 },
+      { colores: [{ hex: "#9AA2A4", nombre: "Heather Grey" }], talla: "L", stock: 14 }
     ]
   },
   {
@@ -114,9 +114,9 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "Premium performance hoodie crafted from structured neoprene-blend fabric. Ergonomic sleeves and adjustable hood deliver structured style on and off the field.",
     variantes: [
-      { color: "Charcoal", talla: "S", stock: 10 },
-      { color: "Charcoal", talla: "M", stock: 15 },
-      { color: "Charcoal", talla: "L", stock: 12 }
+      { colores: [{ hex: "#36454F", nombre: "Charcoal" }], talla: "S", stock: 10 },
+      { colores: [{ hex: "#36454F", nombre: "Charcoal" }], talla: "M", stock: 15 },
+      { colores: [{ hex: "#36454F", nombre: "Charcoal" }], talla: "L", stock: 12 }
     ]
   },
 
@@ -134,9 +134,9 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "Flowy, relaxed-fit linen blend trench coat. Double-breasted layout with storm flaps and structured belt. The ultimate modern layering piece for spring and autumn.",
     variantes: [
-      { color: "Sand Dune", talla: "XS", stock: 4 },
-      { color: "Sand Dune", talla: "S", stock: 10 },
-      { color: "Sand Dune", talla: "M", stock: 12 }
+      { colores: [{ hex: "#C6AC8C", nombre: "Sand Dune" }], talla: "XS", stock: 4 },
+      { colores: [{ hex: "#C6AC8C", nombre: "Sand Dune" }], talla: "S", stock: 10 },
+      { colores: [{ hex: "#C6AC8C", nombre: "Sand Dune" }], talla: "M", stock: 12 }
     ]
   },
   {
@@ -152,9 +152,9 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "A-line summer dress woven in breathable GOTS-certified organic cotton. Side seam pockets and soft, adjustable straps provide functional comfort.",
     variantes: [
-      { color: "Ecrú", talla: "S", stock: 14 },
-      { color: "Ecrú", talla: "M", stock: 16 },
-      { color: "Sage Green", talla: "S", stock: 8 }
+      { colores: [{ hex: "#C2B280", nombre: "Ecrú" }], talla: "S", stock: 14 },
+      { colores: [{ hex: "#C2B280", nombre: "Ecrú" }], talla: "M", stock: 16 },
+      { colores: [{ hex: "#9DC183", nombre: "Sage Green" }], talla: "S", stock: 8 }
     ]
   },
 
@@ -172,9 +172,9 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "Knitted from ultra-fine Australian merino wool. Offers self-regulating thermal properties and an elegant structured collar ideal for smart casual wear.",
     variantes: [
-      { color: "Mocha", talla: "M", stock: 10 },
-      { color: "Mocha", talla: "L", stock: 12 },
-      { color: "Cream", talla: "M", stock: 8 }
+      { colores: [{ hex: "#A38068", nombre: "Mocha" }], talla: "M", stock: 10 },
+      { colores: [{ hex: "#A38068", nombre: "Mocha" }], talla: "L", stock: 12 },
+      { colores: [{ hex: "#FFFDD0", nombre: "Cream" }], talla: "M", stock: 8 }
     ]
   },
   {
@@ -190,9 +190,9 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "Heavyweight cotton drill overshirt with matte horn buttons. Dual chest pockets and square hem. Perfect as a lightweight jacket in transition seasons.",
     variantes: [
-      { color: "Camel", talla: "S", stock: 6 },
-      { color: "Camel", talla: "M", stock: 14 },
-      { color: "Camel", talla: "L", stock: 10 }
+      { colores: [{ hex: "#C19A6B", nombre: "Camel" }], talla: "S", stock: 6 },
+      { colores: [{ hex: "#C19A6B", nombre: "Camel" }], talla: "M", stock: 14 },
+      { colores: [{ hex: "#C19A6B", nombre: "Camel" }], talla: "L", stock: 10 }
     ]
   },
 
@@ -210,9 +210,9 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "Tough-wearing calfskin leather boots with deep lug soles. Features lateral elastic gussets and custom heel pull tabs for easy slip-on comfort.",
     variantes: [
-      { color: "Raven Black", talla: "37", stock: 6 },
-      { color: "Raven Black", talla: "38", stock: 10 },
-      { color: "Raven Black", talla: "39", stock: 8 }
+      { colores: [{ hex: "#1B1B1B", nombre: "Raven Black" }], talla: "37", stock: 6 },
+      { colores: [{ hex: "#1B1B1B", nombre: "Raven Black" }], talla: "38", stock: 10 },
+      { colores: [{ hex: "#1B1B1B", nombre: "Raven Black" }], talla: "39", stock: 8 }
     ]
   },
 
@@ -230,9 +230,9 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "Full-grain Italian leather sneakers with custom margom rubber outsoles. Clean design, free of labels, delivering versatile style from weekdays to weekends.",
     variantes: [
-      { color: "Optic White", talla: "41", stock: 8 },
-      { color: "Optic White", talla: "42", stock: 15 },
-      { color: "Optic White", talla: "43", stock: 12 }
+      { colores: [{ hex: "#FFFFFF", nombre: "Optic White" }], talla: "41", stock: 8 },
+      { colores: [{ hex: "#FFFFFF", nombre: "Optic White" }], talla: "42", stock: 15 },
+      { colores: [{ hex: "#FFFFFF", nombre: "Optic White" }], talla: "43", stock: 12 }
     ]
   },
 
@@ -250,7 +250,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "Minimalist multi-dial watch featuring Japanese quartz movement, black oxide coated stainless steel chassis, and an elegant genuine leather strap.",
     variantes: [
-      { color: "Stealth Black", talla: "One-Size", stock: 25 }
+      { colores: [{ hex: "#121212", nombre: "Stealth Black" }], talla: "One-Size", stock: 25 }
     ]
   },
   {
@@ -266,7 +266,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "Handcrafted acetate frames equipped with polarized scratch-resistant category-3 lenses. Provides 100% UVA/UVB protection.",
     variantes: [
-      { color: "Tortoise", talla: "One-Size", stock: 35 }
+      { colores: [{ hex: "#312E29", nombre: "Tortoise" }], talla: "One-Size", stock: 35 }
     ]
   },
 
@@ -284,7 +284,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     ],
     descripcion: "Thick lambswool knit beanie in beautiful cable texture. Extremely warm, featuring a secure ribbed brim to maintain fit.",
     variantes: [
-      { color: "Oatmeal", talla: "One-Size", stock: 15 }
+      { colores: [{ hex: "#E5D3B3", nombre: "Oatmeal" }], talla: "One-Size", stock: 15 }
     ]
   }
 ];

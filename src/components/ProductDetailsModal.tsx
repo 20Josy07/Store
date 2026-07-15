@@ -21,13 +21,13 @@ export default function ProductDetailsModal({
   onClose,
   onAddToCart
 }: ProductDetailsModalProps) {
-  // Extract unique colors and sizes from variants
-  const colors = Array.from(new Set(product.variantes.map(v => v.color)));
+  // Extract unique color combinations and sizes from variants
+  const colorCombinations = Array.from(new Set(product.variantes.map(v => v.colores.map(c => c.nombre).join(' / '))));
   const sizes = Array.from(new Set(product.variantes.map(v => v.talla)));
 
   // States
   const [selectedImage, setSelectedImage] = useState(product.imagenes[0]);
-  const [selectedColor, setSelectedColor] = useState(colors[0] || '');
+  const [selectedColorCombo, setSelectedColorCombo] = useState(colorCombinations[0] || '');
   const [selectedSize, setSelectedSize] = useState(sizes[0] || '');
   const [quantity, setQuantity] = useState(1);
   const [activeAccordion, setActiveAccordion] = useState<string | null>('materials');
@@ -35,14 +35,14 @@ export default function ProductDetailsModal({
   // Sync selected image if product changes
   useEffect(() => {
     setSelectedImage(product.imagenes[0]);
-    if (colors.length > 0) setSelectedColor(colors[0]);
+    if (colorCombinations.length > 0) setSelectedColorCombo(colorCombinations[0]);
     if (sizes.length > 0) setSelectedSize(sizes[0]);
     setQuantity(1);
   }, [product]);
 
   // Find stock for selected variant
   const currentVariant = product.variantes.find(
-    v => v.color === selectedColor && v.talla === selectedSize
+    v => v.colores.map(c => c.nombre).join(' / ') === selectedColorCombo && v.talla === selectedSize
   );
   const availableStock = currentVariant ? currentVariant.stock : 0;
 
@@ -56,7 +56,7 @@ export default function ProductDetailsModal({
       alert("¡Esta combinación de talla y color está agotada actualmente!");
       return;
     }
-    const success = await onAddToCart(product, quantity, selectedColor, selectedSize);
+    const success = await onAddToCart(product, quantity, selectedColorCombo, selectedSize);
     if (success !== false) {
       onClose();
     }
@@ -159,26 +159,38 @@ export default function ProductDetailsModal({
             </p>
 
             {/* Color Swatch Selector */}
-            {colors.length > 0 && (
+            {colorCombinations.length > 0 && (
               <div className="mt-5">
                 <span className="text-xs font-bold text-gray-900 block mb-2">
-                  Color: <span className="text-gray-500 font-medium">{selectedColor}</span>
+                  Color: <span className="text-gray-500 font-medium">{selectedColorCombo}</span>
                 </span>
                 <div className="flex flex-wrap gap-2.5">
-                  {colors.map((color) => {
-                    const swatchStyle = getColorStyle(color);
+                  {colorCombinations.map((combo) => {
+                    const variantColors = product.variantes.find(v => v.colores.map(c => c.nombre).join(' / ') === combo)?.colores || [];
+                    const isSelected = selectedColorCombo === combo;
 
                     return (
                       <button
-                        key={color}
-                        onClick={() => setSelectedColor(color)}
-                        className={`w-8 h-8 rounded-full ${swatchStyle} transition-all relative ${
-                          selectedColor === color 
+                        key={combo}
+                        onClick={() => setSelectedColorCombo(combo)}
+                        className={`w-8 h-8 rounded-full overflow-hidden transition-all relative flex ${
+                          isSelected 
                             ? 'ring-2 ring-[#1A1A1A] ring-offset-2 scale-110 shadow-sm' 
-                            : 'hover:scale-105 opacity-90'
+                            : 'hover:scale-105 opacity-90 border border-gray-200'
                         }`}
-                        title={color}
-                      />
+                        title={combo}
+                      >
+                        {variantColors.map((c, i) => (
+                          <div 
+                            key={i} 
+                            className="h-full" 
+                            style={{ 
+                              backgroundColor: c.hex, 
+                              width: `${100 / variantColors.length}%` 
+                            }} 
+                          />
+                        ))}
+                      </button>
                     );
                   })}
                 </div>

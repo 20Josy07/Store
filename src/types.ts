@@ -4,7 +4,7 @@
  */
 
 export interface ProductVariant {
-  color: string;
+  colores: { hex: string; nombre: string }[];
   talla: string;
   stock: number;
 }

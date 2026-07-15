@@ -237,7 +237,7 @@ export default function App() {
   // --- CART CONTROLS ---
   const handleAddToCart = async (product: Product, quantity = 1, color = '', size = '') => {
     // If no specific color or size provided, take the first available from variants
-    const selectedColor = color || (product.variantes[0] ? product.variantes[0].color : 'Standard');
+    const selectedColor = color || (product.variantes[0] ? product.variantes[0].colores.map(c => c.nombre).join(' / ') : 'Standard');
     const selectedSize = size || (product.variantes[0] ? product.variantes[0].talla : 'One-Size');
 
     const success = await reserveStockInDB(product.id, selectedColor, selectedSize, quantity);
