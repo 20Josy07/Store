@@ -85,6 +85,16 @@ service cloud.firestore {
              (data.categoria_restringida == null || data.categoria_restringida is string);
     }
 
+    function isValidReview(data) {
+      return data.keys().hasAll(['producto_id', 'usuario_id', 'usuario_nombre', 'rating', 'comentario', 'fecha_creacion']) &&
+             data.producto_id is string &&
+             data.usuario_id is string &&
+             data.usuario_nombre is string &&
+             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             data.comentario is string && data.comentario.size() <= 1000 &&
+             data.fecha_creacion is string;
+    }
+
     function isValidHomeConfig(data) {
       return data.keys().hasAll(['id', 'banner1_texto', 'banner1_bg', 'banner2_texto', 'banner2_bg']) &&
              data.id is string &&
@@ -144,6 +154,17 @@ service cloud.firestore {
       allow create: if (isAdmin() || (configId == 'home_cms' ? isValidHomeConfig(incoming()) : true));
       allow update: if isAdmin() && (configId == 'home_cms' ? isValidHomeConfig(incoming()) : true);
       allow delete: if isAdmin();
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidReview(incoming()) && incoming().usuario_id == request.auth.uid && isValidId(reviewId);
+      allow update: if (isAdmin() || (isSignedIn() && existing().usuario_id == request.auth.uid)) && isValidReview(incoming()) && isValidId(reviewId);
+      allow delete: if isAdmin() || (isSignedIn() && existing().usuario_id == request.auth.uid);
+    }
+
+    match /test/connection {
+      allow read: if true;
     }
   }
 }

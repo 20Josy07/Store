@@ -163,19 +163,19 @@ export default function AdminPanel({
 
   // En stock: Any product with total variant stock > 0
   const productsInStock = products.filter(p => {
-    const totalStock = p.variantes.reduce((acc, v) => acc + v.stock, 0);
+    const totalStock = (p.variantes || []).reduce((acc, v) => acc + v.stock, 0);
     return totalStock > 0;
   }).length;
 
   // Stock bajo: Any product with at least one variant having stock between 1 and 5
   const productsLowStock = products.filter(p => {
-    return p.variantes.some(v => v.stock > 0 && v.stock <= 5);
+    return (p.variantes || []).some(v => v.stock > 0 && v.stock <= 5);
   }).length;
 
   // Agotados: Any product with total variant stock === 0 (or no variants declared)
   const productsOutOfStock = products.filter(p => {
-    if (p.variantes.length === 0) return true;
-    const totalStock = p.variantes.reduce((acc, v) => acc + v.stock, 0);
+    if (!p.variantes || p.variantes.length === 0) return true;
+    const totalStock = (p.variantes || []).reduce((acc, v) => acc + v.stock, 0);
     return totalStock === 0;
   }).length;
 
@@ -258,7 +258,7 @@ export default function AdminPanel({
   };
 
   const handleAddVariant = () => {
-    const hasInvalidColor = newVariant.colores.some(c => !c.hex || !c.nombre);
+    const hasInvalidColor = (newVariant.colores || []).some(c => !c.hex || !c.nombre);
     if (hasInvalidColor || !newVariant.talla || newVariant.stock < 0) {
       showToast("Completa los Colores (Hex y Nombre), Talla y Stock para la variante.", "error");
       return;
@@ -269,7 +269,7 @@ export default function AdminPanel({
     const exists = productForm.variantes.some(
       (v, idx) => 
         idx !== editingVariantIndex &&
-        JSON.stringify(v.colores) === JSON.stringify(newVariant.colores) && 
+        JSON.stringify(v.colores || []) === JSON.stringify(newVariant.colores) && 
         v.talla.toLowerCase() === newVariant.talla.toLowerCase()
     );
 
@@ -815,7 +815,7 @@ export default function AdminPanel({
                       {/* Colores de la variante */}
                       <div className="space-y-2 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
                         <label className="text-[10px] uppercase font-bold text-slate-500 block mb-1">Colores de esta variante</label>
-                        {newVariant.colores.map((c, idx) => (
+                        {newVariant.colores && newVariant.colores.map((c, idx) => (
                           <div key={idx} className="flex gap-2 items-center">
                             <input
                               type="text"
@@ -839,13 +839,13 @@ export default function AdminPanel({
                               placeholder="Nombre del color (ej. Azul Marino)"
                               className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-[10px] focus:ring-1 focus:ring-slate-300 text-slate-800"
                             />
-                            {newVariant.colores.length > 1 && (
+                                {(newVariant.colores || []).length > 1 && (
                               <button
                                 type="button"
                                 onClick={() => {
                                   setNewVariant({
                                     ...newVariant,
-                                    colores: newVariant.colores.filter((_, i) => i !== idx)
+                                    colores: (newVariant.colores || []).filter((_, i) => i !== idx)
                                   });
                                 }}
                                 className="text-red-400 hover:text-red-600 p-1"
@@ -857,7 +857,7 @@ export default function AdminPanel({
                         ))}
                         <button
                           type="button"
-                          onClick={() => setNewVariant({ ...newVariant, colores: [...newVariant.colores, { hex: '', nombre: '' }] })}
+                          onClick={() => setNewVariant({ ...newVariant, colores: [...(newVariant.colores || []), { hex: '', nombre: '' }] })}
                           className="text-[9px] text-blue-600 font-bold hover:underline flex items-center gap-1"
                         >
                           + Añadir otro color a esta variante
@@ -902,7 +902,7 @@ export default function AdminPanel({
                             <div key={index} className="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-xl text-[10px] font-semibold text-slate-600 border border-slate-100">
                               <div className="flex items-center gap-2 truncate">
                                 <div className="flex -space-x-1">
-                                  {v.colores.map((c, i) => (
+                                  {(v.colores || []).map((c, i) => (
                                     <span 
                                       key={i} 
                                       className="w-3 h-3 rounded-full border border-white" 
@@ -912,7 +912,7 @@ export default function AdminPanel({
                                   ))}
                                 </div>
                                 <span className="truncate">
-                                  {v.colores.map(c => c.nombre).join(' / ')} - Talla {v.talla} ({v.stock} uds)
+                                  {(v.colores || []).map(c => c.nombre).join(' / ')} - Talla {v.talla} ({v.stock} uds)
                                 </span>
                               </div>
                               <div className="flex items-center gap-1">
@@ -1014,7 +1014,7 @@ export default function AdminPanel({
                               p.id.toLowerCase().includes(searchTermInventory.toLowerCase())
                             )
                             .map(p => {
-                            const totalStock = p.variantes.reduce((acc, v) => acc + v.stock, 0);
+                            const totalStock = (p.variantes || []).reduce((acc, v) => acc + v.stock, 0);
                             return (
                               <tr key={p.id} className="text-xs text-slate-700 hover:bg-slate-50/40 transition-colors">
                                 <td className="py-3.5 flex items-center gap-3">
@@ -1026,7 +1026,7 @@ export default function AdminPanel({
                                     <div className="flex items-center gap-1.5 mt-0.5">
                                       <span className="text-[10px] text-slate-400 font-semibold block uppercase">SKU: {p.id} | {p.marca}</span>
                                       <div className="flex gap-1 ml-1">
-                                        {Array.from(new Set(p.variantes.flatMap(v => v.colores))).filter((v, i, a) => a.findIndex(t => t.hex === v.hex) === i).map((c, i) => (
+                                        {Array.from(new Set((p.variantes || []).flatMap(v => v.colores || []))).filter((v, i, a) => v && a.findIndex(t => t && t.hex === v.hex) === i).map((c, i) => (
                                           <span 
                                             key={i} 
                                             className="w-2 h-2 rounded-full border border-slate-200" 
@@ -1058,7 +1058,7 @@ export default function AdminPanel({
                                       {totalStock === 0 ? 'Agotado' : `${totalStock} uds`}
                                     </span>
                                     <span className="text-[9px] text-slate-400 max-w-[150px] truncate block leading-none">
-                                      {p.variantes.map(v => `${v.colores.map(c => c.nombre).join('/')}(${v.talla}):${v.stock}`).join(', ')}
+                                      {(p.variantes || []).map(v => `${(v.colores || []).map(c => c.nombre).join('/')}(${v.talla}):${v.stock}`).join(', ')}
                                     </span>
                                   </div>
                                 </td>

@@ -22,8 +22,8 @@ export default function ProductDetailsModal({
   onAddToCart
 }: ProductDetailsModalProps) {
   // Extract unique color combinations and sizes from variants
-  const colorCombinations = Array.from(new Set(product.variantes.map(v => v.colores.map(c => c.nombre).join(' / '))));
-  const sizes = Array.from(new Set(product.variantes.map(v => v.talla)));
+  const colorCombinations = Array.from(new Set((product.variantes || []).map(v => (v.colores || []).map(c => c.nombre).join(' / '))));
+  const sizes = Array.from(new Set((product.variantes || []).map(v => v.talla)));
 
   // States
   const [selectedImage, setSelectedImage] = useState(product.imagenes[0]);
@@ -41,8 +41,8 @@ export default function ProductDetailsModal({
   }, [product]);
 
   // Find stock for selected variant
-  const currentVariant = product.variantes.find(
-    v => v.colores.map(c => c.nombre).join(' / ') === selectedColorCombo && v.talla === selectedSize
+  const currentVariant = (product.variantes || []).find(
+    v => (v.colores || []).map(c => c.nombre).join(' / ') === selectedColorCombo && v.talla === selectedSize
   );
   const availableStock = currentVariant ? currentVariant.stock : 0;
 
@@ -166,7 +166,7 @@ export default function ProductDetailsModal({
                 </span>
                 <div className="flex flex-wrap gap-2.5">
                   {colorCombinations.map((combo) => {
-                    const variantColors = product.variantes.find(v => v.colores.map(c => c.nombre).join(' / ') === combo)?.colores || [];
+                    const variantColors = (product.variantes || []).find(v => (v.colores || []).map(c => c.nombre).join(' / ') === combo)?.colores || [];
                     const isSelected = selectedColorCombo === combo;
 
                     return (

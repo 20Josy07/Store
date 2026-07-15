@@ -174,7 +174,7 @@ export async function reserveStockInDB(productId: string, color: string, size: s
 
       let hasAvailableStock = false;
       const updatedVariantes = productData.variantes.map(v => {
-        const variantColorName = v.colores.map(c => c.nombre).join(' / ');
+        const variantColorName = (v.colores || []).map(c => c.nombre).join(' / ');
         if (variantColorName.toLowerCase() === color.toLowerCase() && v.talla.toLowerCase() === size.toLowerCase()) {
           if (v.stock >= quantity) {
             hasAvailableStock = true;
@@ -216,7 +216,7 @@ export async function releaseStockInDB(productId: string, color: string, size: s
       }
 
       const updatedVariantes = productData.variantes.map(v => {
-        const variantColorName = v.colores.map(c => c.nombre).join(' / ');
+        const variantColorName = (v.colores || []).map(c => c.nombre).join(' / ');
         if (variantColorName.toLowerCase() === color.toLowerCase() && v.talla.toLowerCase() === size.toLowerCase()) {
           return {
             ...v,
